@@ -40,65 +40,85 @@
   <!-- 3. GLASSMORPHISM HUD OVERLAY LAYER (z-index: 10) -->
   <div class="hud-layer">
 
-    <!-- TOP HEADER BAR -->
-    <header class="flex items-center justify-between pointer-events-none">
-      <!-- Cyberpunk Brand Badge -->
-      <div class="glass-panel px-4 py-2 flex items-center gap-3 border-blue-500/40 pointer-events-auto">
-        <div class="w-9 h-9 rounded-lg bg-gradient-to-tr from-blue-900 via-cyan-600 to-cyan-400 flex items-center justify-center shadow-lg shadow-cyan-500/30 text-white font-black text-sm border border-cyan-400/50 cyber-logo-badge">
-          <i class="fa-solid fa-crosshairs text-cyan-100 text-base cyber-crosshair-icon"></i>
-        </div>
-        <div>
-          <div class="flex items-center gap-2">
-            <span class="font-display text-sm font-black tracking-wider text-cyan-400 uppercase">
-              RE-DEFEND AI
-            </span>
-            <span class="text-slate-500">|</span>
-            <span class="font-display text-xs font-semibold text-slate-200 tracking-wide">
-              Real-Time 3D Stress Engine
-            </span>
-          </div>
-          <div class="text-[10px] font-mono text-slate-400 flex items-center gap-2">
-            <span class="text-emerald-400 font-bold">PUNE URBAN METRO</span>
-            <span class="inline-block w-1 h-1 rounded-full bg-slate-500"></span>
-            <span>18.5204° N, 73.8567° E</span>
-          </div>
+    <!-- TOP SECTION: PROTOTYPE NOTICE & HEADER -->
+    <div class="flex flex-col gap-2 pointer-events-none">
+      <!-- TOP PROTOTYPE NOTICE BANNER -->
+      <div class="flex justify-center pointer-events-none">
+        <div class="prototype-banner flex items-center gap-2 px-4 py-1 rounded-full pointer-events-auto select-none">
+          <span class="relative flex h-2 w-2">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+            <span class="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span>
+          </span>
+          <span class="text-[11px] font-mono tracking-wide text-slate-200">
+            <span class="text-amber-400">⚠️</span>
+            <span class="font-bold text-amber-300">DEMO PROTOTYPE MODEL</span>
+            <span class="text-slate-400">—</span>
+            <span>Full Enterprise Production Engine in Active Development</span>
+            <span class="text-cyan-400 font-semibold">(Release ETA: 30 Days)</span>
+          </span>
         </div>
       </div>
 
-      <!-- Center Threat Status Badge -->
-      <div id="threat-container" class="glass-panel px-4 py-1.5 flex items-center gap-3 border-emerald-500/40 pointer-events-auto">
-        <span class="relative flex h-3 w-3">
-          <span id="threat-ping" class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-          <span id="threat-dot" class="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
-        </span>
-        <div>
-          <div class="text-[9px] uppercase font-mono tracking-widest text-slate-400">DEFCON PROTOCOL</div>
-          <div id="threat-label" class="font-display text-xs font-black tracking-wider text-emerald-400 font-mono">DEFCON 4 // NOMINAL</div>
+      <!-- TOP HEADER BAR -->
+      <header class="flex items-center justify-between pointer-events-none">
+        <!-- Cyberpunk Brand Badge -->
+        <div class="glass-panel px-4 py-2 flex items-center gap-3 border-blue-500/40 pointer-events-auto">
+          <div class="w-9 h-9 rounded-lg bg-gradient-to-tr from-blue-900 via-cyan-600 to-cyan-400 flex items-center justify-center shadow-lg shadow-cyan-500/30 text-white font-black text-sm border border-cyan-400/50 cyber-logo-badge">
+            <i class="fa-solid fa-crosshairs text-cyan-100 text-base cyber-crosshair-icon"></i>
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="font-display text-sm font-black tracking-wider text-cyan-400 uppercase">
+                RE-DEFEND AI
+              </span>
+              <span class="text-slate-500">|</span>
+              <span class="font-display text-xs font-semibold text-slate-200 tracking-wide">
+                Real-Time 3D Stress Engine
+              </span>
+            </div>
+            <div class="text-[10px] font-mono text-slate-400 flex items-center gap-2">
+              <span class="text-emerald-400 font-bold">PUNE URBAN METRO</span>
+              <span class="inline-block w-1 h-1 rounded-full bg-slate-500"></span>
+              <span>18.5204° N, 73.8567° E</span>
+            </div>
+          </div>
         </div>
-      </div>
 
-      <!-- Quick View Action Controls -->
-      <div class="glass-panel px-3 py-1.5 flex items-center gap-2 pointer-events-auto">
-        <button id="btn-focus-pune" class="text-xs px-2.5 py-1.5 rounded bg-slate-800 hover:bg-blue-900/60 hover:text-cyan-300 border border-slate-700 text-slate-200 font-medium transition flex items-center gap-1.5" title="Center camera on Pune Grid">
-          <i class="fa-solid fa-crosshairs text-cyan-400"></i>
-          <span>Reset Camera</span>
-        </button>
-        <button id="btn-toggle-orbit" class="text-xs px-2.5 py-1.5 rounded bg-slate-800 hover:bg-blue-900/60 hover:text-cyan-300 border border-slate-700 text-slate-200 font-medium transition flex items-center gap-1.5" title="Toggle Auto-Orbit Rotation">
-          <i id="orbit-icon" class="fa-solid fa-globe text-cyan-400"></i>
-          <span id="orbit-text">Auto Rotate</span>
-        </button>
-        <button id="btn-reset-all" class="text-xs px-2.5 py-1.5 rounded bg-slate-800 hover:bg-rose-900/60 hover:text-rose-300 border border-slate-700 text-slate-200 font-medium transition flex items-center gap-1.5" title="Reset all sliders">
-          <i class="fa-solid fa-rotate-right text-rose-400"></i>
-          <span>Reset</span>
-        </button>
-      </div>
-    </header>
+        <!-- Center Threat Status Badge -->
+        <div id="threat-container" class="glass-panel px-4 py-1.5 flex items-center gap-3 border-emerald-500/40 pointer-events-auto">
+          <span class="relative flex h-3 w-3">
+            <span id="threat-ping" class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+            <span id="threat-dot" class="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
+          </span>
+          <div>
+            <div class="text-[9px] uppercase font-mono tracking-widest text-slate-400">DEFCON PROTOCOL</div>
+            <div id="threat-label" class="font-display text-xs font-black tracking-wider text-emerald-400 font-mono">DEFCON 4 // NOMINAL</div>
+          </div>
+        </div>
+
+        <!-- Quick View Action Controls -->
+        <div class="glass-panel px-3 py-1.5 flex items-center gap-2 pointer-events-auto">
+          <button id="btn-focus-pune" class="text-xs px-2.5 py-1.5 rounded bg-slate-800 hover:bg-blue-900/60 hover:text-cyan-300 border border-slate-700 text-slate-200 font-medium transition flex items-center gap-1.5" title="Center camera on Pune Grid">
+            <i class="fa-solid fa-crosshairs text-cyan-400"></i>
+            <span>Reset Camera</span>
+          </button>
+          <button id="btn-toggle-orbit" class="text-xs px-2.5 py-1.5 rounded bg-blue-900/60 hover:bg-blue-900/80 text-cyan-300 border border-cyan-500/50 font-medium transition flex items-center gap-1.5" title="Toggle Auto-Orbit Rotation">
+            <i id="orbit-icon" class="fa-solid fa-pause text-cyan-400"></i>
+            <span id="orbit-text">Pause Rotation</span>
+          </button>
+          <button id="btn-reset-all" class="text-xs px-2.5 py-1.5 rounded bg-slate-800 hover:bg-rose-900/60 hover:text-rose-300 border border-slate-700 text-slate-200 font-medium transition flex items-center gap-1.5" title="Reset all sliders">
+            <i class="fa-solid fa-rotate-right text-rose-400"></i>
+            <span>Reset</span>
+          </button>
+        </div>
+      </header>
+    </div>
 
     <!-- MIDDLE WORKSPACE: LEFT HUD PANEL + RIGHT TELEMETRY PANEL -->
     <div class="flex justify-between items-start my-auto pointer-events-none gap-4">
 
       <!-- LEFT FLOATING GLASS PANEL (STRESSORS) -->
-      <aside class="glass-panel w-80 p-4 pointer-events-auto max-h-[calc(100vh-270px)] overflow-y-auto">
+      <aside class="glass-panel w-80 p-4 pointer-events-auto max-h-[calc(100vh-295px)] overflow-y-auto">
         <div class="flex items-center justify-between border-b border-slate-700/60 pb-2 mb-3">
           <h2 class="font-display text-xs font-bold uppercase tracking-wider text-cyan-400 flex items-center gap-2">
             <i class="fa-solid fa-sliders"></i>
@@ -202,7 +222,7 @@
       </aside>
 
       <!-- RIGHT FLOATING GLASS PANEL (TELEMETRY) -->
-      <aside class="glass-panel w-80 p-4 pointer-events-auto max-h-[calc(100vh-270px)] overflow-y-auto">
+      <aside class="glass-panel w-80 p-4 pointer-events-auto max-h-[calc(100vh-295px)] overflow-y-auto">
         <div class="flex items-center justify-between border-b border-slate-700/60 pb-2 mb-3">
           <h2 class="font-display text-xs font-bold uppercase tracking-wider text-cyan-400 flex items-center gap-2">
             <i class="fa-solid fa-chart-pie"></i>

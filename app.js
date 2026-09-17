@@ -374,7 +374,7 @@ class CyberpunkGeospatialVisualizer {
 
     this.nodeMeshes = {};
     this.arcLines = [];
-    this.autoRotate = false;
+    this.autoRotate = true; // Auto-orbit enabled by default on load
     this.hoveredNode = null;
 
     // Center of Pune Metropolitan Grid (18.5204° N, 73.8567° E)
@@ -975,11 +975,15 @@ class HUDController {
       const icon = document.getElementById('orbit-icon');
       const text = document.getElementById('orbit-text');
       if (this.visualizer.autoRotate) {
-        text.textContent = 'Stop Rotate';
+        text.textContent = 'Pause Rotation';
         icon.className = 'fa-solid fa-pause text-cyan-400';
+        this.btnToggleOrbit.className = 'text-xs px-2.5 py-1.5 rounded bg-blue-900/60 hover:bg-blue-900/80 text-cyan-300 border border-cyan-500/50 font-medium transition flex items-center gap-1.5';
+        this.logTerminal('[CAMERA] Auto-orbit camera rotation resumed.', 'info');
       } else {
         text.textContent = 'Auto Rotate';
         icon.className = 'fa-solid fa-globe text-cyan-400';
+        this.btnToggleOrbit.className = 'text-xs px-2.5 py-1.5 rounded bg-slate-800 hover:bg-blue-900/60 hover:text-cyan-300 border border-slate-700 text-slate-200 font-medium transition flex items-center gap-1.5';
+        this.logTerminal('[CAMERA] Auto-orbit camera rotation paused.', 'info');
       }
     });
 
