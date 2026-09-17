@@ -1,0 +1,119 @@
+[
+  {
+    "id": "node_01",
+    "name": "Parvati Water Works",
+    "type": "water",
+    "lat": 18.4967,
+    "lng": 73.8504,
+    "capacity": 100,
+    "dependency_node_ids": ["node_02"]
+  },
+  {
+    "id": "node_02",
+    "name": "Parvati MSEDCL 220kV Substation",
+    "type": "power",
+    "lat": 18.4982,
+    "lng": 73.8491,
+    "capacity": 100,
+    "dependency_node_ids": []
+  },
+  {
+    "id": "node_03",
+    "name": "Sassoon General Hospital",
+    "type": "hospital",
+    "lat": 18.5266,
+    "lng": 73.8744,
+    "capacity": 100,
+    "dependency_node_ids": ["node_04", "node_05"]
+  },
+  {
+    "id": "node_04",
+    "name": "Shivajinagar MSEDCL Substation",
+    "type": "power",
+    "lat": 18.5308,
+    "lng": 73.8474,
+    "capacity": 100,
+    "dependency_node_ids": []
+  },
+  {
+    "id": "node_05",
+    "name": "Pune Station Transit Hub & Underpass",
+    "type": "transit",
+    "lat": 18.5284,
+    "lng": 73.8739,
+    "capacity": 100,
+    "dependency_node_ids": []
+  },
+  {
+    "id": "node_06",
+    "name": "University Circle (Savitribai Phule Junction)",
+    "type": "transit",
+    "lat": 18.5416,
+    "lng": 73.8262,
+    "capacity": 100,
+    "dependency_node_ids": []
+  },
+  {
+    "id": "node_07",
+    "name": "Deenanath Mangeshkar Hospital",
+    "type": "hospital",
+    "lat": 18.5042,
+    "lng": 73.8344,
+    "capacity": 100,
+    "dependency_node_ids": ["node_08", "node_09"]
+  },
+  {
+    "id": "node_08",
+    "name": "Kothrud 132kV Substation",
+    "type": "power",
+    "lat": 18.5074,
+    "lng": 73.8077,
+    "capacity": 100,
+    "dependency_node_ids": []
+  },
+  {
+    "id": "node_09",
+    "name": "Sinhagad Road Junction (Rajaram Bridge)",
+    "type": "transit",
+    "lat": 18.4908,
+    "lng": 73.8341,
+    "capacity": 100,
+    "dependency_node_ids": []
+  },
+  {
+    "id": "node_10",
+    "name": "Swargate Multimodal Transit Hub",
+    "type": "transit",
+    "lat": 18.5018,
+    "lng": 73.8587,
+    "capacity": 100,
+    "dependency_node_ids": []
+  },
+  {
+    "id": "node_11",
+    "name": "Ruby Hall Clinic (Bund Garden)",
+    "type": "hospital",
+    "lat": 18.5327,
+    "lng": 73.8778,
+    "capacity": 100,
+    "dependency_node_ids": ["node_04", "node_05"]
+  },
+  {
+    "id": "node_12",
+    "name": "Hadapsar Industrial Substation",
+    "type": "power",
+    "lat": 18.5089,
+    "lng": 73.9259,
+    "capacity": 100,
+    "dependency_node_ids": []
+  },
+  {
+    "id": "node_13",
+    "name": "Lashkar Pumping Station (Cantonment)",
+    "type": "water",
+    "lat": 18.5173,
+    "lng": 73.8831,
+    "capacity": 100,
+    "dependency_node_ids": ["node_12"]
+  }
+]

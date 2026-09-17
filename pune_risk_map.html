@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-glyphicons.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.2.0/css/all.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/python-visualization/folium/folium/templates/leaflet.awesome.rotate.min.css"/>
+    
+            <meta name="viewport" content="width=device-width,
+                initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+            <style>
+                #map_a7b07654b8e7c8e1658057e4539d24cd {
+                    position: relative;
+                    width: 100.0%;
+                    height: 100.0%;
+                    left: 0.0%;
+                    top: 0.0%;
+                }
+                .leaflet-container { font-size: 1rem; }
+            </style>
+
+            <style>html, body {
+                width: 100%;
+                height: 100%;
+                margin: 0;
+                padding: 0;
+            }
+            </style>
+
+            <style>#map {
+                position:absolute;
+                top:0;
+                bottom:0;
+                right:0;
+                left:0;
+                }
+            </style>
+
+            <script>
+                L_NO_TOUCH = false;
+                L_DISABLE_3D = false;
+            </script>
+
+        
+</head>
+<body>
+    
+    
+<div style="position: fixed; bottom: 30px; left: 30px; width: 190px; height: 130px; 
+     background-color: white; border:2px solid #555; z-index:9999; font-size:13px;
+     padding: 10px; border-radius: 8px; box-shadow: 2px 2px 6px rgba(0,0,0,0.4); font-family: sans-serif;">
+     <b>System Risk Status</b><br><br>
+     <i style="background: green; width: 12px; height: 12px; display: inline-block; margin-right: 8px; border-radius: 50%;"></i> Operational (100%)<br>
+     <i style="background: orange; width: 12px; height: 12px; display: inline-block; margin-right: 8px; border-radius: 50%;"></i> Degraded (>0%)<br>
+     <i style="background: red; width: 12px; height: 12px; display: inline-block; margin-right: 8px; border-radius: 50%;"></i> Failed (0%)<br>
+     <span style="border-top: 2px dashed red; display: inline-block; width: 18px; margin-top: 8px; margin-right: 5px;"></span> Failure Connection
+</div>
+    
+            <div class="folium-map" id="map_a7b07654b8e7c8e1658057e4539d24cd" ></div>
+        
+</body>
+<script>
+    
+    
+            var map_a7b07654b8e7c8e1658057e4539d24cd = L.map(
+                "map_a7b07654b8e7c8e1658057e4539d24cd",
+                {
+                    center: [18.5204, 73.8567],
+                    crs: L.CRS.EPSG3857,
+                    ...{
+  "zoom": 13,
+  "zoomControl": true,
+  "preferCanvas": false,
+}
+
+                }
+            );
+
+            
+
+        
+    
+            var tile_layer_60e9e683cfb3928d936811fd3a88d04a = L.tileLayer(
+                "https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}",
+                {
+  "minZoom": 0,
+  "maxZoom": 18,
+  "maxNativeZoom": 18,
+  "noWrap": false,
+  "attribution": "Esri",
+  "subdomains": "abc",
+  "detectRetina": false,
+  "tms": false,
+  "opacity": 1,
+}
+
+            );
+        
+    
+            tile_layer_60e9e683cfb3928d936811fd3a88d04a.addTo(map_a7b07654b8e7c8e1658057e4539d24cd);
+        
+    
+            var poly_line_9ff5e326d0f8dbe33a18e37e99585a05 = L.polyline(
+                [[18.4982, 73.8491], [18.4967, 73.8504]],
+                {"bubblingMouseEvents": true, "color": "red", "dashArray": "6, 6", "dashOffset": null, "fill": false, "fillColor": "red", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.7, "smoothFactor": 1.0, "stroke": true, "weight": 3}
+            ).addTo(map_a7b07654b8e7c8e1658057e4539d24cd);
+        
+    
+            poly_line_9ff5e326d0f8dbe33a18e37e99585a05.bindTooltip(
+                `<div>
+                     Dependency: Parvati MSEDCL 220kV Substation → Parvati Water Works
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_90aa3cba97895894a7389c03a7083b02 = L.polyline(
+                [[18.5308, 73.8474], [18.5266, 73.8744]],
+                {"bubblingMouseEvents": true, "color": "red", "dashArray": "6, 6", "dashOffset": null, "fill": false, "fillColor": "red", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.7, "smoothFactor": 1.0, "stroke": true, "weight": 3}
+            ).addTo(map_a7b07654b8e7c8e1658057e4539d24cd);
+        
+    
+            poly_line_90aa3cba97895894a7389c03a7083b02.bindTooltip(
+                `<div>
+                     Dependency: Shivajinagar MSEDCL Substation → Sassoon General Hospital
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_b6d55821da37730b14914859419afb2c = L.polyline(
+                [[18.5284, 73.8739], [18.5266, 73.8744]],
+                {"bubblingMouseEvents": true, "color": "red", "dashArray": "6, 6", "dashOffset": null, "fill": false, "fillColor": "red", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.7, "smoothFactor": 1.0, "stroke": true, "weight": 3}
+            ).addTo(map_a7b07654b8e7c8e1658057e4539d24cd);
+        
+    
+            poly_line_b6d55821da37730b14914859419afb2c.bindTooltip(
+                `<div>
+                     Dependency: Pune Station Transit Hub & Underpass → Sassoon General Hospital
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_62694071943ee80b4afb8ad2b33986eb = L.polyline(
+                [[18.5074, 73.8077], [18.5042, 73.8344]],
+                {"bubblingMouseEvents": true, "color": "red", "dashArray": "6, 6", "dashOffset": null, "fill": false, "fillColor": "red", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.7, "smoothFactor": 1.0, "stroke": true, "weight": 3}
+            ).addTo(map_a7b07654b8e7c8e1658057e4539d24cd);
+        
+    
+            poly_line_62694071943ee80b4afb8ad2b33986eb.bindTooltip(
+                `<div>
+                     Dependency: Kothrud 132kV Substation → Deenanath Mangeshkar Hospital
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_2050cfa7205c679bcb41cd9390714cc9 = L.polyline(
+                [[18.4908, 73.8341], [18.5042, 73.8344]],
+                {"bubblingMouseEvents": true, "color": "red", "dashArray": "6, 6", "dashOffset": null, "fill": false, "fillColor": "red", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.7, "smoothFactor": 1.0, "stroke": true, "weight": 3}
+            ).addTo(map_a7b07654b8e7c8e1658057e4539d24cd);
+        
+    
+            poly_line_2050cfa7205c679bcb41cd9390714cc9.bindTooltip(
+                `<div>
+                     Dependency: Sinhagad Road Junction (Rajaram Bridge) → Deenanath Mangeshkar Hospital
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_6b6b091f366bc94e69933bb9bc3dcef4 = L.polyline(
+                [[18.5308, 73.8474], [18.5327, 73.8778]],
+                {"bubblingMouseEvents": true, "color": "red", "dashArray": "6, 6", "dashOffset": null, "fill": false, "fillColor": "red", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.7, "smoothFactor": 1.0, "stroke": true, "weight": 3}
+            ).addTo(map_a7b07654b8e7c8e1658057e4539d24cd);
+        
+    
+            poly_line_6b6b091f366bc94e69933bb9bc3dcef4.bindTooltip(
+                `<div>
+                     Dependency: Shivajinagar MSEDCL Substation → Ruby Hall Clinic (Bund Garden)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_9b820b914d0da786544fdef7e6c237df = L.polyline(
+                [[18.5284, 73.8739], [18.5327, 73.8778]],
+                {"bubblingMouseEvents": true, "color": "red", "dashArray": "6, 6", "dashOffset": null, "fill": false, "fillColor": "red", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.7, "smoothFactor": 1.0, "stroke": true, "weight": 3}
+            ).addTo(map_a7b07654b8e7c8e1658057e4539d24cd);
+        
+    
+            poly_line_9b820b914d0da786544fdef7e6c237df.bindTooltip(
+                `<div>
+                     Dependency: Pune Station Transit Hub & Underpass → Ruby Hall Clinic (Bund Garden)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_746b534325007241cf0b195136ff4fdc = L.polyline(
+                [[18.5089, 73.9259], [18.5173, 73.8831]],
+                {"bubblingMouseEvents": true, "color": "red", "dashArray": "6, 6", "dashOffset": null, "fill": false, "fillColor": "red", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.7, "smoothFactor": 1.0, "stroke": true, "weight": 3}
+            ).addTo(map_a7b07654b8e7c8e1658057e4539d24cd);
+        
+    
+            poly_line_746b534325007241cf0b195136ff4fdc.bindTooltip(
+                `<div>
+                     Dependency: Hadapsar Industrial Substation → Lashkar Pumping Station (Cantonment)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_1aa82f3f9f25371f3391d1c8365cae2e = L.circleMarker(
+                [18.4967, 73.8504],
+                {"bubblingMouseEvents": true, "color": "red", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "red", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 9, "stroke": true, "weight": 3}
+            ).addTo(map_a7b07654b8e7c8e1658057e4539d24cd);
+        
+    
+        var popup_a98379d84e4cf37c58540b572937c6e5 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_a1444206fe049cdbe0d6cd6f0f0fdd96 = $(`<div id="html_a1444206fe049cdbe0d6cd6f0f0fdd96" style="width: 100.0%; height: 100.0%;"><b>Parvati Water Works</b><br>Type: <b>WATER</b><br>Status: <b>0.0% Operational</b></div>`)[0];
+                popup_a98379d84e4cf37c58540b572937c6e5.setContent(html_a1444206fe049cdbe0d6cd6f0f0fdd96);
+            
+        
+
+        circle_marker_1aa82f3f9f25371f3391d1c8365cae2e.bindPopup(popup_a98379d84e4cf37c58540b572937c6e5)
+        ;
+
+        
+    
+    
+            var circle_marker_d9dc2331b46f6601d84716fcd9a24262 = L.circleMarker(
+                [18.4982, 73.8491],
+                {"bubblingMouseEvents": true, "color": "red", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "red", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 9, "stroke": true, "weight": 3}
+            ).addTo(map_a7b07654b8e7c8e1658057e4539d24cd);
+        
+    
+        var popup_5472b646ca62a77477f8138deedf4df0 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_20aa9a822c0052e944a8c7cfee36a550 = $(`<div id="html_20aa9a822c0052e944a8c7cfee36a550" style="width: 100.0%; height: 100.0%;"><b>Parvati MSEDCL 220kV Substation</b><br>Type: <b>POWER</b><br>Status: <b>0.0% Operational</b></div>`)[0];
+                popup_5472b646ca62a77477f8138deedf4df0.setContent(html_20aa9a822c0052e944a8c7cfee36a550);
+            
+        
+
+        circle_marker_d9dc2331b46f6601d84716fcd9a24262.bindPopup(popup_5472b646ca62a77477f8138deedf4df0)
+        ;
+
+        
+    
+    
+            var circle_marker_91cea265ba75815c160e58dc31815abb = L.circleMarker(
+                [18.5266, 73.8744],
+                {"bubblingMouseEvents": true, "color": "orange", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "orange", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 9, "stroke": true, "weight": 3}
+            ).addTo(map_a7b07654b8e7c8e1658057e4539d24cd);
+        
+    
+        var popup_a6fe83a9d91d1229c31e6c46c82fd0ed = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_51874933c2f93ab15dbfbd695122d897 = $(`<div id="html_51874933c2f93ab15dbfbd695122d897" style="width: 100.0%; height: 100.0%;"><b>Sassoon General Hospital</b><br>Type: <b>HOSPITAL</b><br>Status: <b>15.0% Operational</b></div>`)[0];
+                popup_a6fe83a9d91d1229c31e6c46c82fd0ed.setContent(html_51874933c2f93ab15dbfbd695122d897);
+            
+        
+
+        circle_marker_91cea265ba75815c160e58dc31815abb.bindPopup(popup_a6fe83a9d91d1229c31e6c46c82fd0ed)
+        ;
+
+        
+    
+    
+            var circle_marker_a8cc8945ce50fc4b7dbc1c3da09668ee = L.circleMarker(
+                [18.5308, 73.8474],
+                {"bubblingMouseEvents": true, "color": "red", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "red", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 9, "stroke": true, "weight": 3}
+            ).addTo(map_a7b07654b8e7c8e1658057e4539d24cd);
+        
+    
+        var popup_ea612756f3a2d659bb25f3d31a972922 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_54ec4c9b1329776c381a752764f98814 = $(`<div id="html_54ec4c9b1329776c381a752764f98814" style="width: 100.0%; height: 100.0%;"><b>Shivajinagar MSEDCL Substation</b><br>Type: <b>POWER</b><br>Status: <b>0.0% Operational</b></div>`)[0];
+                popup_ea612756f3a2d659bb25f3d31a972922.setContent(html_54ec4c9b1329776c381a752764f98814);
+            
+        
+
+        circle_marker_a8cc8945ce50fc4b7dbc1c3da09668ee.bindPopup(popup_ea612756f3a2d659bb25f3d31a972922)
+        ;
+
+        
+    
+    
+            var circle_marker_124053f5a874eec86dc72845df680153 = L.circleMarker(
+                [18.5284, 73.8739],
+                {"bubblingMouseEvents": true, "color": "red", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "red", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 9, "stroke": true, "weight": 3}
+            ).addTo(map_a7b07654b8e7c8e1658057e4539d24cd);
+        
+    
+        var popup_e052915782b377711fea674c38f7759d = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_5d15ba981a0e0ff72012eaf7a6b036af = $(`<div id="html_5d15ba981a0e0ff72012eaf7a6b036af" style="width: 100.0%; height: 100.0%;"><b>Pune Station Transit Hub & Underpass</b><br>Type: <b>TRANSIT</b><br>Status: <b>0.0% Operational</b></div>`)[0];
+                popup_e052915782b377711fea674c38f7759d.setContent(html_5d15ba981a0e0ff72012eaf7a6b036af);
+            
+        
+
+        circle_marker_124053f5a874eec86dc72845df680153.bindPopup(popup_e052915782b377711fea674c38f7759d)
+        ;
+
+        
+    
+    
+            var circle_marker_4af3402d6345617479f6f34e4d22fbc5 = L.circleMarker(
+                [18.5416, 73.8262],
+                {"bubblingMouseEvents": true, "color": "red", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "red", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 9, "stroke": true, "weight": 3}
+            ).addTo(map_a7b07654b8e7c8e1658057e4539d24cd);
+        
+    
+        var popup_9d34b2e271234ca86a0f30adf5aa9292 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_4060f9350d2fe9913d6b4c651b266754 = $(`<div id="html_4060f9350d2fe9913d6b4c651b266754" style="width: 100.0%; height: 100.0%;"><b>University Circle (Savitribai Phule Junction)</b><br>Type: <b>TRANSIT</b><br>Status: <b>0.0% Operational</b></div>`)[0];
+                popup_9d34b2e271234ca86a0f30adf5aa9292.setContent(html_4060f9350d2fe9913d6b4c651b266754);
+            
+        
+
+        circle_marker_4af3402d6345617479f6f34e4d22fbc5.bindPopup(popup_9d34b2e271234ca86a0f30adf5aa9292)
+        ;
+
+        
+    
+    
+            var circle_marker_3e9753334e39f3acc4e542e62726b447 = L.circleMarker(
+                [18.5042, 73.8344],
+                {"bubblingMouseEvents": true, "color": "orange", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "orange", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 9, "stroke": true, "weight": 3}
+            ).addTo(map_a7b07654b8e7c8e1658057e4539d24cd);
+        
+    
+        var popup_b44a4f0972c1c0b2042f533a035cda39 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_abd53095c3977bb7e80e3e580a33ac92 = $(`<div id="html_abd53095c3977bb7e80e3e580a33ac92" style="width: 100.0%; height: 100.0%;"><b>Deenanath Mangeshkar Hospital</b><br>Type: <b>HOSPITAL</b><br>Status: <b>15.0% Operational</b></div>`)[0];
+                popup_b44a4f0972c1c0b2042f533a035cda39.setContent(html_abd53095c3977bb7e80e3e580a33ac92);
+            
+        
+
+        circle_marker_3e9753334e39f3acc4e542e62726b447.bindPopup(popup_b44a4f0972c1c0b2042f533a035cda39)
+        ;
+
+        
+    
+    
+            var circle_marker_af17f9805dc24f3226c4894005e2d971 = L.circleMarker(
+                [18.5074, 73.8077],
+                {"bubblingMouseEvents": true, "color": "red", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "red", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 9, "stroke": true, "weight": 3}
+            ).addTo(map_a7b07654b8e7c8e1658057e4539d24cd);
+        
+    
+        var popup_1166263c2727b34adb0d49598cfde61f = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_f63db8ab8d0809f7dd4d96537a80ab21 = $(`<div id="html_f63db8ab8d0809f7dd4d96537a80ab21" style="width: 100.0%; height: 100.0%;"><b>Kothrud 132kV Substation</b><br>Type: <b>POWER</b><br>Status: <b>0.0% Operational</b></div>`)[0];
+                popup_1166263c2727b34adb0d49598cfde61f.setContent(html_f63db8ab8d0809f7dd4d96537a80ab21);
+            
+        
+
+        circle_marker_af17f9805dc24f3226c4894005e2d971.bindPopup(popup_1166263c2727b34adb0d49598cfde61f)
+        ;
+
+        
+    
+    
+            var circle_marker_f4e05b0fedc48ac2d2593e95dc683b6d = L.circleMarker(
+                [18.4908, 73.8341],
+                {"bubblingMouseEvents": true, "color": "red", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "red", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 9, "stroke": true, "weight": 3}
+            ).addTo(map_a7b07654b8e7c8e1658057e4539d24cd);
+        
+    
+        var popup_d7e07c69f82a1c64a715e6eb2f789671 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_43c8c933618c11447a296b03f3d565dc = $(`<div id="html_43c8c933618c11447a296b03f3d565dc" style="width: 100.0%; height: 100.0%;"><b>Sinhagad Road Junction (Rajaram Bridge)</b><br>Type: <b>TRANSIT</b><br>Status: <b>0.0% Operational</b></div>`)[0];
+                popup_d7e07c69f82a1c64a715e6eb2f789671.setContent(html_43c8c933618c11447a296b03f3d565dc);
+            
+        
+
+        circle_marker_f4e05b0fedc48ac2d2593e95dc683b6d.bindPopup(popup_d7e07c69f82a1c64a715e6eb2f789671)
+        ;
+
+        
+    
+    
+            var circle_marker_fcf9713a59343b1532df4ca0ac16fb75 = L.circleMarker(
+                [18.5018, 73.8587],
+                {"bubblingMouseEvents": true, "color": "red", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "red", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 9, "stroke": true, "weight": 3}
+            ).addTo(map_a7b07654b8e7c8e1658057e4539d24cd);
+        
+    
+        var popup_8cc867c90963357e6545ad36bcc9ae2f = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_1c231969b78216f90b441c5d693916f0 = $(`<div id="html_1c231969b78216f90b441c5d693916f0" style="width: 100.0%; height: 100.0%;"><b>Swargate Multimodal Transit Hub</b><br>Type: <b>TRANSIT</b><br>Status: <b>0.0% Operational</b></div>`)[0];
+                popup_8cc867c90963357e6545ad36bcc9ae2f.setContent(html_1c231969b78216f90b441c5d693916f0);
+            
+        
+
+        circle_marker_fcf9713a59343b1532df4ca0ac16fb75.bindPopup(popup_8cc867c90963357e6545ad36bcc9ae2f)
+        ;
+
+        
+    
+    
+            var circle_marker_a5bc4ce21ffa497d0dc68bf2a42e481c = L.circleMarker(
+                [18.5327, 73.8778],
+                {"bubblingMouseEvents": true, "color": "orange", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "orange", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 9, "stroke": true, "weight": 3}
+            ).addTo(map_a7b07654b8e7c8e1658057e4539d24cd);
+        
+    
+        var popup_f9b13a522ce15de1a71a3872ecd885cb = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_9132a5d9d6cd929b17bc60be9f2e4979 = $(`<div id="html_9132a5d9d6cd929b17bc60be9f2e4979" style="width: 100.0%; height: 100.0%;"><b>Ruby Hall Clinic (Bund Garden)</b><br>Type: <b>HOSPITAL</b><br>Status: <b>15.0% Operational</b></div>`)[0];
+                popup_f9b13a522ce15de1a71a3872ecd885cb.setContent(html_9132a5d9d6cd929b17bc60be9f2e4979);
+            
+        
+
+        circle_marker_a5bc4ce21ffa497d0dc68bf2a42e481c.bindPopup(popup_f9b13a522ce15de1a71a3872ecd885cb)
+        ;
+
+        
+    
+    
+            var circle_marker_a5e75adc88efd878c813ed46daa6cbbf = L.circleMarker(
+                [18.5089, 73.9259],
+                {"bubblingMouseEvents": true, "color": "red", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "red", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 9, "stroke": true, "weight": 3}
+            ).addTo(map_a7b07654b8e7c8e1658057e4539d24cd);
+        
+    
+        var popup_3d469d09297b678d1db48c14d021b42a = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_bbd4a12ace2bba33d94902ef95bfa0b5 = $(`<div id="html_bbd4a12ace2bba33d94902ef95bfa0b5" style="width: 100.0%; height: 100.0%;"><b>Hadapsar Industrial Substation</b><br>Type: <b>POWER</b><br>Status: <b>0.0% Operational</b></div>`)[0];
+                popup_3d469d09297b678d1db48c14d021b42a.setContent(html_bbd4a12ace2bba33d94902ef95bfa0b5);
+            
+        
+
+        circle_marker_a5e75adc88efd878c813ed46daa6cbbf.bindPopup(popup_3d469d09297b678d1db48c14d021b42a)
+        ;
+
+        
+    
+    
+            var circle_marker_f4115a591baab4e5bc5a58c313a75033 = L.circleMarker(
+                [18.5173, 73.8831],
+                {"bubblingMouseEvents": true, "color": "red", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "red", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 9, "stroke": true, "weight": 3}
+            ).addTo(map_a7b07654b8e7c8e1658057e4539d24cd);
+        
+    
+        var popup_6befb66b70e1cb7303eb3267685ea891 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_882058bfe1c1c169b8451f797fb46bdf = $(`<div id="html_882058bfe1c1c169b8451f797fb46bdf" style="width: 100.0%; height: 100.0%;"><b>Lashkar Pumping Station (Cantonment)</b><br>Type: <b>WATER</b><br>Status: <b>0.0% Operational</b></div>`)[0];
+                popup_6befb66b70e1cb7303eb3267685ea891.setContent(html_882058bfe1c1c169b8451f797fb46bdf);
+            
+        
+
+        circle_marker_f4115a591baab4e5bc5a58c313a75033.bindPopup(popup_6befb66b70e1cb7303eb3267685ea891)
+        ;
+
+        
+    
+</script>
+</html>

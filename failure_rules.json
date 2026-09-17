@@ -1,0 +1,33 @@
+{
+  "environmental_thresholds": {
+    "power": {
+      "heat_degradation_start_temp_c": 40.0,
+      "heat_trip_temp_c": 45.0,
+      "degradation_rate_per_degree": 20.0,
+      "rainfall_submersion_trip_mm_hr": 90.0
+    },
+    "transit": {
+      "rainfall_minor_delay_mm_hr": 40.0,
+      "rainfall_impassable_mm_hr": 75.0,
+      "capacity_drop_at_minor": 40.0,
+      "capacity_drop_at_impassable": 100.0
+    },
+    "water": {
+      "flooding_damage_mm_hr": 100.0
+    }
+  },
+  "cascading_rules": {
+    "power_loss_impact": {
+      "hospital": {
+        "capacity_drop_on_power_failure": 50.0,
+        "backup_generator_duration_hours": 12
+      },
+      "water": {
+        "capacity_drop_on_power_failure": 100.0
+      }
+    },
+    "transit_loss_impact": {
+      "hospital_access_restriction_pct": 35.0
+    }
+  }
+}
