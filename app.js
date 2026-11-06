@@ -130,9 +130,12 @@ class ClimateSimulationEngine {
   constructor() {
     this.nodes = {};
     this.inputs = {
-      temp: 32,      // 30°C - 50°C
-      rain: 25,      // 0 - 150 mm/hr
-      gridLoad: 70   // 50% - 100%
+      temp: 32,      // 30°C - 50°C Ambient Temperature
+      rain: 25,      // 0 - 150 mm/hr Monsoon Rainfall
+      gridLoad: 70,  // 50% - 100% Power Grid Load
+      cyber: 0,      // 0% - 100% SCADA Cyber-Attack Index
+      wind: 15,      // 0 - 120 km/h Cyclonic Wind Speed
+      soil: 20       // 0% - 100% Soil Saturation / Liquefaction Index
     };
     this.previousStates = {};
     this.mitigationActive = false;
@@ -153,16 +156,19 @@ class ClimateSimulationEngine {
     });
   }
 
-  setInputs(temp, rain, gridLoad) {
+  setInputs(temp, rain, gridLoad, cyber = 0, wind = 15, soil = 20) {
     this.inputs.temp = parseFloat(temp);
     this.inputs.rain = parseFloat(rain);
     this.inputs.gridLoad = parseFloat(gridLoad);
+    this.inputs.cyber = parseFloat(cyber !== undefined ? cyber : this.inputs.cyber);
+    this.inputs.wind = parseFloat(wind !== undefined ? wind : this.inputs.wind);
+    this.inputs.soil = parseFloat(soil !== undefined ? soil : this.inputs.soil);
     this.mitigationActive = false;
     this.recalculate();
   }
 
   recalculate() {
-    const { temp, rain, gridLoad } = this.inputs;
+    const { temp, rain, gridLoad, cyber, wind, soil } = this.inputs;
 
     // Reset base operational capacities
     Object.values(this.nodes).forEach(n => {
@@ -170,30 +176,82 @@ class ClimateSimulationEngine {
       n.failureReason = [];
     });
 
-    // 1. PRIMARY STRESS THRESHOLDS
-    // Power Nodes: Fail (0%) if Temp > 40°C AND Grid Load > 85%
+    // 1. PRIMARY CLIMATIC & THREAT VECTOR THRESHOLDS
+    // Power Nodes: Thermal Overload if Temp > 40°C AND Grid Load > 85%
     const powerFailed = (temp > 40.0 && gridLoad > 85.0);
 
-    // Transit Nodes: Fail (0%) if Monsoon Rain > 80 mm/hr
+    // Transit Nodes: Monsoon Submersion if Rain > 80 mm/hr
     const transitFailed = (rain > 80.0);
+
+    // SCADA Cyber-Attack Threat Logic
+    const cyberWidespread = (cyber > 85.0);
+    const cyberTargeted = (cyber > 70.0);
+    const cyberInfiltration = (cyber > 40.0);
+
+    // Gale-Force Wind & Compound Insulator Flashover
+    const windCyclonic = (wind > 90.0);
+    const windGale = (wind > 70.0);
+    const windRainCompound = (wind > 70.0 && rain > 60.0);
+
+    // Soil Liquefaction & Tunnel Subsidence
+    const soilLiquefaction = (soil > 75.0);
+    const soilCompound = (soil > 65.0 && rain > 70.0);
 
     Object.values(this.nodes).forEach(node => {
       if (node.type === 'power') {
+        // SCADA Cyber Attack Payload Override
+        if (cyberWidespread) {
+          node.operationalCapacity = 0.0;
+          node.failureReason.push(`SCADA Root Override (${cyber}%): All 220kV/132kV RTUs Breached & Busbars Disconnected`);
+        } else if (cyberTargeted && (node.id === 'node_02' || node.id === 'node_04')) {
+          node.operationalCapacity = node.id === 'node_02' ? 0.0 : 25.0;
+          node.failureReason.push(`Targeted SCADA Exploit (${cyber}%): Malicious Breaker Trip Injected into Substation Logic`);
+        } else if (cyberInfiltration && (node.id === 'node_02' || node.id === 'node_08')) {
+          node.operationalCapacity = Math.min(node.operationalCapacity, 60.0);
+          node.failureReason.push(`SCADA Infiltration (${cyber}%): Telemetry Spoofing & Remote Terminal Unit Lag`);
+        }
+
+        // Thermal, Inundation & Wind Compound Stress
         if (powerFailed) {
           node.operationalCapacity = 0.0;
           node.failureReason.push(`Thermal Overload (Temp: ${temp}°C > 40°C & Load: ${gridLoad}% > 85%)`);
-        } else if (temp > 40.0) {
+        } else if (temp > 40.0 && node.operationalCapacity > 50.0) {
           node.operationalCapacity = 50.0; // High temp degradation
         } else if (rain >= 90.0) {
           node.operationalCapacity = 0.0;
           node.failureReason.push(`Substation Inundation (${rain} mm/hr >= 90 mm/hr)`);
         }
-      } else if (node.type === 'transit') {
-        if (transitFailed) {
+
+        // Wind Speed Stress
+        if (windRainCompound && (node.id === 'node_08' || node.id === 'node_04')) {
           node.operationalCapacity = 0.0;
-          node.failureReason.push(`Monsoon Submersion (${rain} mm/hr > 80 mm/hr)`);
-        } else if (rain >= 40.0) {
+          node.failureReason.push(`Cyclonic Compound: Insulator Flashover from Gale Winds (${wind} km/h) & Rain (${rain} mm/hr)`);
+        } else if (windCyclonic && (node.id === 'node_08' || node.id === 'node_12')) {
+          node.operationalCapacity = 0.0;
+          node.failureReason.push(`Cyclonic Wind (${wind} km/h > 90 km/h): High-Voltage Tower Structural Trip`);
+        }
+      } else if (node.type === 'transit') {
+        // Monsoon Submersion & Soil Liquefaction
+        if (transitFailed || soilCompound) {
+          node.operationalCapacity = 0.0;
+          node.failureReason.push(`Monsoon Submersion & Hydraulic Lock (${rain} mm/hr, Soil: ${soil}%)`);
+        } else if (soilLiquefaction && (node.id === 'node_05' || node.id === 'node_09')) {
+          node.operationalCapacity = node.id === 'node_05' ? 0.0 : 20.0;
+          node.failureReason.push(`Soil Liquefaction (${soil}% > 75%): Underpass Tunnel Subsidence & Foundation Shear`);
+        } else if (rain >= 40.0 && node.operationalCapacity > 60.0) {
           node.operationalCapacity = 60.0; // Traffic delay degradation
+        }
+
+        // Gale Wind Catenary Displacement
+        if (windGale && node.operationalCapacity > 45.0 && (node.id === 'node_06' || node.id === 'node_10')) {
+          node.operationalCapacity = 45.0;
+          node.failureReason.push(`Overhead Catenary Wire Displaced by Gale Winds (${wind} km/h)`);
+        }
+      } else if (node.type === 'water') {
+        // Soil Liquefaction Direct Pipe Shear
+        if (soilLiquefaction && (node.id === 'node_01' || node.id === 'node_13')) {
+          node.operationalCapacity = Math.min(node.operationalCapacity, 35.0);
+          node.failureReason.push(`Subsoil Liquefaction (${soil}%): Main Water Intake Conduit Fractured`);
         }
       }
     });
@@ -249,13 +307,18 @@ class ClimateSimulationEngine {
     // Apply mitigation overrides if user requested
     if (this.mitigationActive) {
       Object.values(this.nodes).forEach(node => {
-        if (node.type === 'hospital' && node.operationalCapacity < 100.0) {
+        if (node.type === 'power' && node.operationalCapacity < 100.0) {
+          node.operationalCapacity = 95.0;
+          node.failureReason = ["AI Fortification: Microgrid Islanding & Automated 220kV Feeder Transfer Active"];
+        } else if (node.type === 'hospital' && node.operationalCapacity < 100.0) {
+          node.operationalCapacity = 100.0;
+          node.failureReason = ["AI Fortification: Synchronized Tier-4 Auxiliary Gen-sets & Priority Route Active"];
+        } else if (node.type === 'water' && node.operationalCapacity < 100.0) {
+          node.operationalCapacity = 95.0;
+          node.failureReason = ["AI Fortification: Autonomous Mobile Microgrid & Auxiliary Pumps Engaged"];
+        } else if (node.type === 'transit' && node.operationalCapacity < 100.0) {
           node.operationalCapacity = 90.0;
-          node.failureReason = ["AI Mitigation: Auxiliary Gen-sets and Air-Ambulance Rerouting Active"];
-        }
-        if (node.type === 'water' && node.operationalCapacity === 0.0) {
-          node.operationalCapacity = 75.0;
-          node.failureReason = ["AI Mitigation: Mobile Solar-Diesel Microgrid Engaged"];
+          node.failureReason = ["AI Fortification: Dynamic Bypass Routing via Elevated Corridors Active"];
         }
       });
     }
@@ -287,6 +350,32 @@ class ClimateSimulationEngine {
     return Math.round(avg);
   }
 
+  getCVI() {
+    if (this.mitigationActive) {
+      return 22; // Controlled nominal safety limit under active prescriptive fortification
+    }
+    const health = this.getOverallHealth();
+    const failedCount = Object.values(this.nodes).filter(n => n.operationalCapacity <= 0).length;
+    const degradedCount = Object.values(this.nodes).filter(n => n.operationalCapacity > 0 && n.operationalCapacity < 100).length;
+
+    // Direct contribution from compound physical & cyber threats
+    const { cyber, wind, soil } = this.inputs;
+    const cyberRisk = (cyber || 0) * 0.22;
+    const windRisk = Math.max(0, ((wind || 15) - 30) * 0.16);
+    const soilRisk = Math.max(0, ((soil || 20) - 35) * 0.18);
+
+    const baseCVI = Math.round(
+      14 +
+      (100 - health) * 0.65 +
+      failedCount * 4.5 +
+      degradedCount * 1.5 +
+      cyberRisk +
+      windRisk +
+      soilRisk
+    );
+    return Math.min(98, Math.max(14, baseCVI));
+  }
+
   getSectorBreakdown() {
     const types = { power: [], transit: [], water: [], hospital: [] };
     Object.values(this.nodes).forEach(n => {
@@ -309,6 +398,17 @@ class ClimateSimulationEngine {
   }
 
   generateAdvice() {
+    if (this.mitigationActive) {
+      return [
+        {
+          title: "Prescriptive Fortification Active // Autonomous Grid Secured",
+          desc: "Microgrid islanding engaged across Parvati & Kothrud. Emergency transit corridors rerouted around flooded underpasses. Hospitals on synchronized auxiliary power. CVI normalized to 22%.",
+          type: "nominal",
+          icon: "fa-shield-halved"
+        }
+      ];
+    }
+
     const failed = Object.values(this.nodes).filter(n => n.operationalCapacity < 100.0);
     if (!failed.length) {
       return [
@@ -362,6 +462,37 @@ class ClimateSimulationEngine {
       });
     }
 
+    // SCADA Cyber Threat Advisory
+    const { cyber, wind, soil } = this.inputs;
+    if (cyber > 40) {
+      advice.push({
+        title: `SCADA Intrusion Payload Detected (${cyber}% Index)`,
+        desc: `Prescriptive Action: Sever WAN connectivity to MSEDCL RTUs. Revert to air-gapped manual relay logic and flush corrupted breaker firmware.`,
+        type: cyber > 70 ? "danger" : "warning",
+        icon: "fa-shield-virus"
+      });
+    }
+
+    // Cyclonic Wind Advisory
+    if (wind > 70) {
+      advice.push({
+        title: `Gale-Force Wind Advisory (${wind} km/h Wind Shear)`,
+        desc: `Prescriptive Action: Pre-tension transmission guy-wires on Koyna-Pune 220kV corridors. Switch transit power to subterranean conduits.`,
+        type: wind > 90 ? "danger" : "warning",
+        icon: "fa-wind"
+      });
+    }
+
+    // Soil Liquefaction Advisory
+    if (soil > 60) {
+      advice.push({
+        title: `Soil Saturation & Liquefaction Hazard (${soil}%)`,
+        desc: `Prescriptive Action: Deploy high-capacity subterranean dewatering pumps along Pune Station underpass and Sinhagad Road riverbank foundations.`,
+        type: soil > 75 ? "danger" : "warning",
+        icon: "fa-mountain"
+      });
+    }
+
     return advice;
   }
 }
@@ -376,6 +507,12 @@ class CyberpunkGeospatialVisualizer {
     this.arcLines = [];
     this.autoRotate = true; // Auto-orbit enabled by default on load
     this.hoveredNode = null;
+
+    // Advanced Countermeasures 3D Meshes & Overlays
+    this.countermeasureActive = false;
+    this.microgridObjects = [];
+    this.corridorObjects = [];
+    this.shockwaveObjects = [];
 
     // Center of Pune Metropolitan Grid (18.5204° N, 73.8567° E)
     this.centerLng = 73.8567;
@@ -415,7 +552,51 @@ class CyberpunkGeospatialVisualizer {
       pitch: 48,
       bearing: -10,
       antialias: true,
-      maxPitch: 80
+      maxPitch: 80,
+      interactive: true,
+      dragPan: true,
+      scrollZoom: true,
+      boxZoom: true,
+      dragRotate: true,
+      touchZoomRotate: true,
+      doubleClickZoom: true,
+      keyboard: true
+    });
+
+    // Add navigation controls (zoom in/out buttons & compass)
+    this.map.addControl(
+      new maplibregl.NavigationControl({
+        visualizePitch: true,
+        showCompass: true,
+        showZoom: true
+      }),
+      'top-right'
+    );
+
+    // Track user drag/zoom interactions so auto-orbit does not fight manual navigation
+    this.isUserInteracting = false;
+    this.wheelTimeout = null;
+
+    this.map.on('mousedown', () => { this.isUserInteracting = true; });
+    this.map.on('mouseup', () => { setTimeout(() => { this.isUserInteracting = false; }, 400); });
+    this.map.on('touchstart', () => { this.isUserInteracting = true; });
+    this.map.on('touchend', () => { setTimeout(() => { this.isUserInteracting = false; }, 400); });
+    this.map.on('dragstart', () => { this.isUserInteracting = true; });
+    this.map.on('dragend', () => { setTimeout(() => { this.isUserInteracting = false; }, 600); });
+    this.map.on('movestart', (e) => {
+      if (e.originalEvent) {
+        this.isUserInteracting = true;
+      }
+    });
+    this.map.on('moveend', (e) => {
+      if (e.originalEvent) {
+        setTimeout(() => { this.isUserInteracting = false; }, 500);
+      }
+    });
+    this.map.on('wheel', () => {
+      this.isUserInteracting = true;
+      clearTimeout(this.wheelTimeout);
+      this.wheelTimeout = setTimeout(() => { this.isUserInteracting = false; }, 800);
     });
 
     this.map.on('load', () => {
@@ -528,8 +709,8 @@ class CyberpunkGeospatialVisualizer {
         // Animations on each frame
         const time = performance.now() * 0.001;
 
-        // Auto-orbit map rotation
-        if (visualizer.autoRotate) {
+        // Auto-orbit map rotation (only when user is not manually navigating)
+        if (visualizer.autoRotate && !visualizer.isUserInteracting) {
           visualizer.map.setBearing(visualizer.map.getBearing() + 0.12);
         }
 
@@ -550,6 +731,49 @@ class CyberpunkGeospatialVisualizer {
         visualizer.arcLines.forEach(arc => {
           if (arc.line.material === arc.failedMat) {
             arc.failedMat.opacity = 0.5 + Math.sin(time * 10) * 0.5;
+          }
+        });
+
+        // Animate active countermeasure shockwaves
+        for (let i = visualizer.shockwaveObjects.length - 1; i >= 0; i--) {
+          const sw = visualizer.shockwaveObjects[i];
+          sw.progress += 0.022;
+          if (sw.progress >= 1.0) {
+            visualizer.scene.remove(sw.mesh);
+            if (sw.mesh.geometry) sw.mesh.geometry.dispose();
+            if (sw.mesh.material) sw.mesh.material.dispose();
+            visualizer.shockwaveObjects.splice(i, 1);
+          } else {
+            const currentScale = 1.0 + sw.progress * 10.0;
+            sw.mesh.scale.set(currentScale, currentScale, 1);
+            sw.mesh.material.opacity = (1.0 - sw.progress) * 0.95;
+          }
+        }
+
+        // Animate microgrid island perimeters
+        visualizer.microgridObjects.forEach(mg => {
+          if (mg.innerRing) {
+            const s = 1.0 + Math.sin(time * 3 + mg.phase) * 0.12;
+            mg.innerRing.scale.set(s, s, 1);
+            mg.innerRing.material.opacity = 0.35 + Math.sin(time * 2.5) * 0.15;
+          }
+          if (mg.borderLine) {
+            mg.borderLine.material.opacity = 0.75 + Math.sin(time * 4) * 0.25;
+          }
+        });
+
+        // Animate emergency ambulance corridor packets & dashed line
+        visualizer.corridorObjects.forEach(corr => {
+          if (corr.curve && corr.beacons) {
+            corr.beacons.forEach((b, idx) => {
+              const offset = idx * 0.5;
+              const t = (time * 0.16 + offset) % 1.0;
+              const pos = corr.curve.getPointAt(t);
+              b.position.copy(pos);
+            });
+          }
+          if (corr.line && corr.line.material) {
+            corr.line.material.opacity = 0.8 + Math.sin(time * 5) * 0.2;
           }
         });
 
@@ -860,6 +1084,273 @@ class CyberpunkGeospatialVisualizer {
       }
     });
   }
+
+  // Floating 3D billboard sprite label for microgrid islands & transit bypass
+  createIslandLabelSprite(text) {
+    const canvas = document.createElement('canvas');
+    canvas.width = 420;
+    canvas.height = 80;
+    const ctx = canvas.getContext('2d');
+
+    // Cyber pill background
+    ctx.fillStyle = 'rgba(15, 23, 42, 0.94)';
+    ctx.strokeStyle = '#06B6D4';
+    ctx.lineWidth = 3;
+    ctx.roundRect(6, 6, 408, 68, 16);
+    ctx.fill();
+    ctx.stroke();
+
+    // Shield status badge
+    ctx.fillStyle = '#10B981';
+    ctx.font = 'bold 22px Inter, sans-serif';
+    ctx.fillText('🛡️ [ONLINE]', 16, 46);
+
+    // Title label text
+    ctx.fillStyle = '#F8FAFC';
+    ctx.font = 'bold 18px Chakra Petch, sans-serif';
+    ctx.fillText(text, 145, 46);
+
+    const texture = new THREE.CanvasTexture(canvas);
+    const spriteMat = new THREE.SpriteMaterial({
+      map: texture,
+      transparent: true,
+      opacity: 0.95
+    });
+    const sprite = new THREE.Sprite(spriteMat);
+    sprite.scale.set(560, 110, 1);
+    return sprite;
+  }
+
+  // Microgrid Islanding Polygon Shield Boundary
+  createMicrogridZone(centerLat, centerLng, radiusMeters, labelText) {
+    const centerPos = this.latLngToMeters(centerLat, centerLng, 6);
+    const segments = 8;
+    const shapePoints = [];
+    const polyPoints3D = [];
+
+    for (let i = 0; i <= segments; i++) {
+      const angle = (i / segments) * Math.PI * 2;
+      const x = Math.cos(angle) * radiusMeters;
+      const z = Math.sin(angle) * radiusMeters;
+      shapePoints.push(new THREE.Vector2(x, z));
+      polyPoints3D.push(new THREE.Vector3(centerPos.x + x, centerPos.y, centerPos.z + z));
+    }
+
+    // 1. Planar glowing polygon fill
+    const shape = new THREE.Shape(shapePoints);
+    const shapeGeo = new THREE.ShapeGeometry(shape);
+    const shapeMat = new THREE.MeshBasicMaterial({
+      color: 0x06B6D4,
+      transparent: true,
+      opacity: 0.16,
+      side: THREE.DoubleSide
+    });
+    const polygonMesh = new THREE.Mesh(shapeGeo, shapeMat);
+    polygonMesh.rotation.x = Math.PI / 2;
+    polygonMesh.position.set(centerPos.x, centerPos.y, centerPos.z);
+    this.scene.add(polygonMesh);
+
+    // 2. Glowing Neon Perimeter Border (LineLoop)
+    const lineGeo = new THREE.BufferGeometry().setFromPoints(polyPoints3D);
+    const lineMat = new THREE.LineBasicMaterial({
+      color: 0x10B981,
+      transparent: true,
+      opacity: 0.9,
+      linewidth: 3
+    });
+    const borderLine = new THREE.LineLoop(lineGeo, lineMat);
+    this.scene.add(borderLine);
+
+    // 3. Concentric radar ring
+    const ringGeo = new THREE.RingGeometry(radiusMeters * 0.45, radiusMeters * 0.52, 32);
+    const ringMat = new THREE.MeshBasicMaterial({
+      color: 0x06B6D4,
+      side: THREE.DoubleSide,
+      transparent: true,
+      opacity: 0.45
+    });
+    const innerRing = new THREE.Mesh(ringGeo, ringMat);
+    innerRing.rotation.x = -Math.PI / 2;
+    innerRing.position.set(centerPos.x, centerPos.y + 3, centerPos.z);
+    this.scene.add(innerRing);
+
+    // 4. Floating 3D Billboard Label
+    const sprite = this.createIslandLabelSprite(labelText);
+    sprite.position.set(centerPos.x, centerPos.y + 320, centerPos.z);
+    this.scene.add(sprite);
+
+    this.microgridObjects.push({
+      polygonMesh,
+      borderLine,
+      innerRing,
+      sprite,
+      phase: Math.random() * Math.PI
+    });
+  }
+
+  // Emergency Transit & Ambulance Rerouting Corridor
+  createAmbulanceCorridor() {
+    // Waypoints routing around flooded Pune underpasses
+    const corridorGPS = [
+      [18.5018, 73.8587], // Swargate Multimodal Transit Hub
+      [18.5090, 73.8520], // Tilak Road Bypass Corridor
+      [18.5170, 73.8440], // Alka Talkies / Deccan Corridor
+      [18.5280, 73.8510], // Shivajinagar Overpass (bypassing underpass)
+      [18.5340, 73.8640], // Sangamwadi Elevated Arterial Link
+      [18.5266, 73.8744], // Sassoon Hospital Emergency Bay
+      [18.5327, 73.8778]  // Ruby Hall Clinic Trauma Wing
+    ];
+
+    const corridorPoints = corridorGPS.map(pt => this.latLngToMeters(pt[0], pt[1], 75));
+    const corridorCurve = new THREE.CatmullRomCurve3(corridorPoints);
+    const curvePoints = corridorCurve.getPoints(120);
+    const corridorGeo = new THREE.BufferGeometry().setFromPoints(curvePoints);
+
+    const corridorMat = new THREE.LineDashedMaterial({
+      color: 0x10B981,
+      dashSize: 70,
+      gapSize: 35,
+      transparent: true,
+      opacity: 0.95,
+      linewidth: 4
+    });
+
+    const corridorLine = new THREE.Line(corridorGeo, corridorMat);
+    corridorLine.computeLineDistances();
+    this.scene.add(corridorLine);
+
+    // Luminous moving ambulance/transit beacons
+    const beacons = [];
+    for (let i = 0; i < 2; i++) {
+      const bGeo = new THREE.SphereGeometry(32, 16, 16);
+      const bMat = new THREE.MeshStandardMaterial({
+        color: 0x38BDF8,
+        emissive: 0x38BDF8,
+        emissiveIntensity: 1.5,
+        roughness: 0.1
+      });
+      const bMesh = new THREE.Mesh(bGeo, bMat);
+      this.scene.add(bMesh);
+      beacons.push(bMesh);
+    }
+
+    // Corridor Billboard Label
+    const midPoint = corridorPoints[3].clone();
+    midPoint.y += 280;
+    const labelSprite = this.createIslandLabelSprite('AMBULANCE BYPASS ACTIVE');
+    labelSprite.position.copy(midPoint);
+    this.scene.add(labelSprite);
+
+    this.corridorObjects.push({
+      line: corridorLine,
+      curve: corridorCurve,
+      beacons,
+      labelSprite
+    });
+  }
+
+  deployCountermeasureVisuals() {
+    this.clearCountermeasureVisuals();
+    this.countermeasureActive = true;
+
+    // 1. Shockwave rings expanding from all nodes
+    Object.values(this.nodeMeshes).forEach(meshRef => {
+      const ringGeo = new THREE.RingGeometry(25, 55, 32);
+      const ringMat = new THREE.MeshBasicMaterial({
+        color: 0x10B981,
+        side: THREE.DoubleSide,
+        transparent: true,
+        opacity: 0.95
+      });
+      const shockwave = new THREE.Mesh(ringGeo, ringMat);
+      shockwave.rotation.x = -Math.PI / 2;
+      shockwave.position.set(meshRef.basePos.x, meshRef.basePos.y + 12, meshRef.basePos.z);
+      this.scene.add(shockwave);
+
+      this.shockwaveObjects.push({
+        mesh: shockwave,
+        progress: 0.0
+      });
+    });
+
+    // 2. Microgrid Islanding Polygon Boundaries (Key Pune Hubs)
+    // Island A: Parvati Microgrid (Water Works & 220kV Substation)
+    this.createMicrogridZone(18.4975, 73.8498, 750, 'PARVATI MICROGRID // 220kV');
+
+    // Island B: Kothrud-Deenanath Microgrid
+    this.createMicrogridZone(18.5058, 73.8210, 1100, 'KOTHRUD-DEENANATH ISLAND');
+
+    // Island C: Central-Sassoon Medical Shield
+    this.createMicrogridZone(18.5290, 73.8640, 1200, 'SASSOON-RUBY MEDICAL SHIELD');
+
+    // 3. Emergency Ambulance & Transit Rerouting Corridor
+    this.createAmbulanceCorridor();
+
+    if (this.map) {
+      this.map.triggerRepaint();
+    }
+  }
+
+  clearCountermeasureVisuals() {
+    this.countermeasureActive = false;
+
+    // Clear shockwaves
+    this.shockwaveObjects.forEach(sw => {
+      this.scene.remove(sw.mesh);
+      if (sw.mesh.geometry) sw.mesh.geometry.dispose();
+      if (sw.mesh.material) sw.mesh.material.dispose();
+    });
+    this.shockwaveObjects = [];
+
+    // Clear microgrids
+    this.microgridObjects.forEach(mg => {
+      if (mg.polygonMesh) {
+        this.scene.remove(mg.polygonMesh);
+        if (mg.polygonMesh.geometry) mg.polygonMesh.geometry.dispose();
+        if (mg.polygonMesh.material) mg.polygonMesh.material.dispose();
+      }
+      if (mg.borderLine) {
+        this.scene.remove(mg.borderLine);
+        if (mg.borderLine.geometry) mg.borderLine.geometry.dispose();
+        if (mg.borderLine.material) mg.borderLine.material.dispose();
+      }
+      if (mg.innerRing) {
+        this.scene.remove(mg.innerRing);
+        if (mg.innerRing.geometry) mg.innerRing.geometry.dispose();
+        if (mg.innerRing.material) mg.innerRing.material.dispose();
+      }
+      if (mg.sprite) {
+        this.scene.remove(mg.sprite);
+        if (mg.sprite.material) mg.sprite.material.dispose();
+      }
+    });
+    this.microgridObjects = [];
+
+    // Clear corridors
+    this.corridorObjects.forEach(corr => {
+      if (corr.line) {
+        this.scene.remove(corr.line);
+        if (corr.line.geometry) corr.line.geometry.dispose();
+        if (corr.line.material) corr.line.material.dispose();
+      }
+      if (corr.beacons) {
+        corr.beacons.forEach(b => {
+          this.scene.remove(b);
+          if (b.geometry) b.geometry.dispose();
+          if (b.material) b.material.dispose();
+        });
+      }
+      if (corr.labelSprite) {
+        this.scene.remove(corr.labelSprite);
+        if (corr.labelSprite.material) corr.labelSprite.material.dispose();
+      }
+    });
+    this.corridorObjects = [];
+
+    if (this.map) {
+      this.map.triggerRepaint();
+    }
+  }
 }
 
 // --- 4. HUD CONTROLLER & EVENT BINDINGS ---
@@ -872,10 +1363,16 @@ class HUDController {
     this.sliderTemp = document.getElementById('slider-temp');
     this.sliderRain = document.getElementById('slider-rain');
     this.sliderLoad = document.getElementById('slider-load');
+    this.sliderCyber = document.getElementById('slider-cyber');
+    this.sliderWind = document.getElementById('slider-wind');
+    this.sliderSoil = document.getElementById('slider-soil');
 
     this.valTemp = document.getElementById('val-temp');
     this.valRain = document.getElementById('val-rain');
     this.valLoad = document.getElementById('val-load');
+    this.valCyber = document.getElementById('val-cyber');
+    this.valWind = document.getElementById('val-wind');
+    this.valSoil = document.getElementById('val-soil');
 
     this.healthValue = document.getElementById('health-value');
     this.healthLabel = document.getElementById('health-label');
@@ -900,11 +1397,19 @@ class HUDController {
     this.aiAdviceContent = document.getElementById('ai-advice-content');
     this.nodesQuickList = document.getElementById('nodes-quick-list');
 
+    this.btnZoomIn = document.getElementById('btn-zoom-in');
+    this.btnZoomOut = document.getElementById('btn-zoom-out');
     this.btnFocusPune = document.getElementById('btn-focus-pune');
     this.btnToggleOrbit = document.getElementById('btn-toggle-orbit');
     this.btnResetAll = document.getElementById('btn-reset-all');
     this.btnClearTerminal = document.getElementById('btn-clear-terminal');
     this.btnApplyMitigation = document.getElementById('btn-apply-mitigation');
+
+    // Tactical Popup Modal & CVI Elements
+    this.headerCviVal = document.getElementById('header-cvi-val');
+    this.tacticalModal = document.getElementById('tactical-modal');
+    this.btnCloseModal = document.getElementById('btn-close-modal');
+    this.btnAckMitigation = document.getElementById('btn-ack-mitigation');
 
     this.bindEvents();
     this.renderNodeMatrix();
@@ -916,6 +1421,18 @@ class HUDController {
       const temp = this.sliderTemp.value;
       const rain = this.sliderRain.value;
       const load = this.sliderLoad.value;
+      const cyber = this.sliderCyber ? parseFloat(this.sliderCyber.value) : 0;
+      const wind = this.sliderWind ? parseFloat(this.sliderWind.value) : 15;
+      const soil = this.sliderSoil ? parseFloat(this.sliderSoil.value) : 20;
+
+      // If user adjusts stressors while countermeasures were active, cleanly disengage
+      if (this.engine.mitigationActive) {
+        this.engine.mitigationActive = false;
+        this.visualizer.clearCountermeasureVisuals();
+        this.hideTacticalModal();
+        this.btnApplyMitigation.className = 'text-xs px-2.5 py-1 rounded bg-blue-600 hover:bg-blue-500 text-white font-semibold transition shadow-md shadow-blue-600/30 flex items-center gap-1.5';
+        this.btnApplyMitigation.innerHTML = '<i class="fa-solid fa-shield-virus"></i><span>Deploy Countermeasures</span>';
+      }
 
       this.valTemp.textContent = `${temp}°C`;
       this.valRain.textContent = `${rain} mm/hr`;
@@ -931,8 +1448,36 @@ class HUDController {
         load > 85 ? 'bg-rose-950 text-rose-400 border-rose-800' : 'bg-yellow-950/80 text-yellow-400 border-yellow-800'
       }`;
 
-      // Run real-time simulation
-      this.engine.setInputs(temp, rain, load);
+      // Update new stress vector value displays & threat badges
+      if (this.valCyber) {
+        this.valCyber.textContent = `${cyber}%`;
+        this.valCyber.className = `font-mono font-bold text-xs px-2 py-0.5 rounded border ${
+          cyber > 70 ? 'bg-rose-950 text-rose-400 border-rose-800 shadow-[0_0_8px_#EF4444]' :
+          cyber > 40 ? 'bg-fuchsia-950/80 text-fuchsia-400 border-fuchsia-800' :
+          'bg-slate-900 text-slate-300 border-slate-700'
+        }`;
+      }
+
+      if (this.valWind) {
+        this.valWind.textContent = `${wind} km/h`;
+        this.valWind.className = `font-mono font-bold text-xs px-2 py-0.5 rounded border ${
+          wind > 90 ? 'bg-rose-950 text-rose-400 border-rose-800 shadow-[0_0_8px_#EF4444]' :
+          wind > 70 ? 'bg-teal-950/80 text-teal-300 border-teal-800' :
+          'bg-slate-900 text-slate-300 border-slate-700'
+        }`;
+      }
+
+      if (this.valSoil) {
+        this.valSoil.textContent = `${soil}%`;
+        this.valSoil.className = `font-mono font-bold text-xs px-2 py-0.5 rounded border ${
+          soil > 75 ? 'bg-rose-950 text-rose-400 border-rose-800 shadow-[0_0_8px_#EF4444]' :
+          soil > 55 ? 'bg-amber-950/80 text-amber-400 border-amber-800' :
+          'bg-slate-900 text-slate-300 border-slate-700'
+        }`;
+      }
+
+      // Run real-time multi-threat simulation
+      this.engine.setInputs(temp, rain, load, cyber, wind, soil);
       this.visualizer.update3DVisuals();
       this.updateHUD();
     };
@@ -940,13 +1485,16 @@ class HUDController {
     this.sliderTemp.addEventListener('input', handleSliderInput);
     this.sliderRain.addEventListener('input', handleSliderInput);
     this.sliderLoad.addEventListener('input', handleSliderInput);
+    if (this.sliderCyber) this.sliderCyber.addEventListener('input', handleSliderInput);
+    if (this.sliderWind) this.sliderWind.addEventListener('input', handleSliderInput);
+    if (this.sliderSoil) this.sliderSoil.addEventListener('input', handleSliderInput);
 
     // Scenario Presets
     const presets = [
-      { id: 'preset-nominal', temp: 32, rain: 25, load: 70 },
-      { id: 'preset-heatwave', temp: 44, rain: 0, load: 90 },
-      { id: 'preset-cloudburst', temp: 28, rain: 110, load: 65 },
-      { id: 'preset-compound', temp: 43, rain: 95, load: 90 }
+      { id: 'preset-nominal', temp: 32, rain: 25, load: 70, cyber: 0, wind: 15, soil: 20 },
+      { id: 'preset-heatwave', temp: 44, rain: 0, load: 90, cyber: 10, wind: 25, soil: 15 },
+      { id: 'preset-cloudburst', temp: 28, rain: 110, load: 65, cyber: 5, wind: 85, soil: 85 },
+      { id: 'preset-compound', temp: 43, rain: 95, load: 90, cyber: 85, wind: 95, soil: 80 }
     ];
 
     presets.forEach(p => {
@@ -959,11 +1507,28 @@ class HUDController {
         this.sliderTemp.value = p.temp;
         this.sliderRain.value = p.rain;
         this.sliderLoad.value = p.load;
+        if (this.sliderCyber) this.sliderCyber.value = p.cyber;
+        if (this.sliderWind) this.sliderWind.value = p.wind;
+        if (this.sliderSoil) this.sliderSoil.value = p.soil;
         handleSliderInput();
 
         this.logTerminal(`[SCENARIO LOADED] ${btn.querySelector('div').textContent} applied.`, 'info');
       });
     });
+
+    if (this.btnZoomIn) {
+      this.btnZoomIn.addEventListener('click', () => {
+        this.visualizer.map.zoomIn({ duration: 400 });
+        this.logTerminal('[CAMERA] Zoom in (+)', 'info');
+      });
+    }
+
+    if (this.btnZoomOut) {
+      this.btnZoomOut.addEventListener('click', () => {
+        this.visualizer.map.zoomOut({ duration: 400 });
+        this.logTerminal('[CAMERA] Zoom out (-)', 'info');
+      });
+    }
 
     this.btnFocusPune.addEventListener('click', () => {
       this.visualizer.focusPune();
@@ -988,6 +1553,13 @@ class HUDController {
     });
 
     this.btnResetAll.addEventListener('click', () => {
+      if (this.engine.mitigationActive) {
+        this.engine.mitigationActive = false;
+        this.visualizer.clearCountermeasureVisuals();
+        this.hideTacticalModal();
+        this.btnApplyMitigation.className = 'text-xs px-2.5 py-1 rounded bg-blue-600 hover:bg-blue-500 text-white font-semibold transition shadow-md shadow-blue-600/30 flex items-center gap-1.5';
+        this.btnApplyMitigation.innerHTML = '<i class="fa-solid fa-shield-virus"></i><span>Deploy Countermeasures</span>';
+      }
       document.getElementById('preset-nominal').click();
       this.visualizer.focusPune();
       this.logTerminal('[RESET] All stressors restored to baseline.', 'info');
@@ -1001,11 +1573,84 @@ class HUDController {
     this.btnApplyMitigation.addEventListener('click', () => {
       this.engine.mitigationActive = true;
       this.engine.recalculate();
+      this.visualizer.deployCountermeasureVisuals();
       this.visualizer.update3DVisuals();
       this.updateHUD();
 
-      this.logTerminal('[AI COUNTERMEASURES ENGAGED] Mobile gen-sets activated at Sassoon & Deenanath hospitals. Parvati water microgrid isolated.', 'success');
+      this.btnApplyMitigation.className = 'text-xs px-2.5 py-1 rounded bg-emerald-600 hover:bg-emerald-500 text-white font-semibold transition shadow-md shadow-emerald-600/40 flex items-center gap-1.5';
+      this.btnApplyMitigation.innerHTML = '<i class="fa-solid fa-shield-halved animate-pulse"></i><span>Countermeasures Active</span>';
+
+      this.showTacticalModal();
+
+      const time = new Date().toLocaleTimeString();
+      this.logTerminal(`[${time}] [SYSTEM ENGAGED] Prescriptive AI Fortification active across Pune Metropolitan Grid.`, 'success');
+      this.logTerminal(`[${time}] [ISOLATION] MSEDCL 220kV Parvati & Kothrud feeders decoupled into autonomous microgrid islands.`, 'info');
+      this.logTerminal(`[${time}] [LOAD SHED] 18.4 MW non-critical commercial load shed; critical lifelines prioritized.`, 'info');
+      this.logTerminal(`[${time}] [REROUTE] Ambulance corridor dynamically routed via elevated bypass corridor (Avoiding Pune Station Underpass).`, 'success');
+      this.logTerminal(`[${time}] [AUX POWER] Sassoon & Deenanath Hospitals switched to synchronized Tier-4 microgrid backup.`, 'info');
+      this.logTerminal(`[${time}] [FORTIFIED] Cascade Vulnerability Index (CVI) normalized to 22% // DEFCON 4 NOMINAL.`, 'success');
     });
+
+    if (this.btnCloseModal) {
+      this.btnCloseModal.addEventListener('click', () => {
+        this.hideTacticalModal();
+      });
+    }
+
+    if (this.btnAckMitigation) {
+      this.btnAckMitigation.addEventListener('click', () => {
+        this.hideTacticalModal();
+      });
+    }
+  }
+
+  showTacticalModal() {
+    if (!this.tacticalModal) return;
+    this.hideTacticalModal();
+
+    this.tacticalModal.classList.add('show');
+
+    if (this.modalProgressBar) {
+      this.modalProgressBar.style.transition = 'none';
+      this.modalProgressBar.style.width = '100%';
+      void this.modalProgressBar.offsetWidth;
+      this.modalProgressBar.style.transition = 'width 4000ms linear';
+      this.modalProgressBar.style.width = '0%';
+    }
+
+    let remainingMs = 4000;
+    if (this.modalCountdown) {
+      this.modalCountdown.textContent = '4.0s';
+    }
+
+    this.modalInterval = setInterval(() => {
+      remainingMs -= 100;
+      if (remainingMs <= 0) {
+        if (this.modalCountdown) this.modalCountdown.textContent = '0.0s';
+        clearInterval(this.modalInterval);
+        this.modalInterval = null;
+      } else if (this.modalCountdown) {
+        this.modalCountdown.textContent = (remainingMs / 1000).toFixed(1) + 's';
+      }
+    }, 100);
+
+    this.modalTimer = setTimeout(() => {
+      this.hideTacticalModal();
+    }, 4000);
+  }
+
+  hideTacticalModal() {
+    if (this.modalTimer) {
+      clearTimeout(this.modalTimer);
+      this.modalTimer = null;
+    }
+    if (this.modalInterval) {
+      clearInterval(this.modalInterval);
+      this.modalInterval = null;
+    }
+    if (this.tacticalModal) {
+      this.tacticalModal.classList.remove('show');
+    }
   }
 
   updateHUD() {
@@ -1013,6 +1658,13 @@ class HUDController {
     const sectors = this.engine.getSectorBreakdown();
     const failedNodes = Object.values(this.engine.nodes).filter(n => n.operationalCapacity === 0);
     const degradedNodes = Object.values(this.engine.nodes).filter(n => n.operationalCapacity > 0 && n.operationalCapacity < 100);
+
+    // 0. Update CVI (Cascade Vulnerability Index) in Header
+    const cvi = this.engine.getCVI();
+    if (this.headerCviVal) {
+      this.headerCviVal.textContent = `${cvi}%`;
+      this.headerCviVal.className = `font-bold ${cvi <= 25 ? 'text-emerald-400' : cvi <= 60 ? 'text-amber-400' : 'text-rose-400'}`;
+    }
 
     // 1. Overall System Health Gauge
     const maxDash = 264;
@@ -1035,7 +1687,13 @@ class HUDController {
     this.healthLabel.style.color = color;
 
     // 2. DEFCON Threat Badge
-    if (failedNodes.length >= 4) {
+    if (this.engine.mitigationActive) {
+      this.threatLabel.textContent = 'DEFCON 4 // NOMINAL (FORTIFIED)';
+      this.threatLabel.className = 'font-display text-xs font-black tracking-wider text-emerald-400 font-mono';
+      this.threatPing.className = 'animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75';
+      this.threatDot.className = 'relative inline-flex rounded-full h-3 w-3 bg-emerald-500';
+      this.threatContainer.className = 'glass-panel px-4 py-1.5 flex items-center gap-3 border-emerald-500/50 shadow-[0_0_15px_rgba(16,185,129,0.3)] pointer-events-auto';
+    } else if (failedNodes.length >= 4) {
       this.threatLabel.textContent = 'DEFCON 1 // CRITICAL COLLAPSE';
       this.threatLabel.className = 'font-display text-xs font-black tracking-wider text-rose-400 font-mono';
       this.threatPing.className = 'animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75';

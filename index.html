@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -18,16 +19,19 @@
   <!-- 1. THREE.JS CDN SCRIPT -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 </head>
+
 <body class="bg-slate-950 text-slate-100 overflow-hidden select-none">
 
   <!-- 2. FULL VIEWPORT GEOSPATIAL MAP CONTAINER (HOSTS REAL TILES + 3D THREE.JS LAYER) -->
   <div id="map"></div>
 
   <!-- 3D Node Hover Tooltip -->
-  <div id="node-tooltip" class="glass-panel px-3 py-2 text-xs min-w-[210px] border border-cyan-500/50 shadow-2xl pointer-events-none">
+  <div id="node-tooltip"
+    class="glass-panel px-3 py-2 text-xs min-w-[210px] border border-cyan-500/50 shadow-2xl pointer-events-none">
     <div class="flex items-center justify-between border-b border-slate-700/70 pb-1 mb-1">
       <span id="tt-name" class="font-bold text-white text-xs font-display">Node Name</span>
-      <span id="tt-type" class="uppercase font-mono text-[9px] px-1.5 py-0.5 rounded bg-blue-950 text-cyan-300 border border-blue-700">TYPE</span>
+      <span id="tt-type"
+        class="uppercase font-mono text-[9px] px-1.5 py-0.5 rounded bg-blue-950 text-cyan-300 border border-blue-700">TYPE</span>
     </div>
     <div class="grid grid-cols-2 gap-1 text-[11px] text-slate-300">
       <div>ID: <span id="tt-id" class="font-mono text-slate-400">node_01</span></div>
@@ -42,28 +46,14 @@
 
     <!-- TOP SECTION: PROTOTYPE NOTICE & HEADER -->
     <div class="flex flex-col gap-2 pointer-events-none">
-      <!-- TOP PROTOTYPE NOTICE BANNER -->
-      <div class="flex justify-center pointer-events-none">
-        <div class="prototype-banner flex items-center gap-2 px-4 py-1 rounded-full pointer-events-auto select-none">
-          <span class="relative flex h-2 w-2">
-            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
-            <span class="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span>
-          </span>
-          <span class="text-[11px] font-mono tracking-wide text-slate-200">
-            <span class="text-amber-400">⚠️</span>
-            <span class="font-bold text-amber-300">DEMO PROTOTYPE MODEL</span>
-            <span class="text-slate-400">—</span>
-            <span>Full Enterprise Production Engine in Active Development</span>
-            <span class="text-cyan-400 font-semibold">(Release ETA: 30 Days)</span>
-          </span>
-        </div>
-      </div>
+
 
       <!-- TOP HEADER BAR -->
       <header class="flex items-center justify-between pointer-events-none">
         <!-- Cyberpunk Brand Badge -->
         <div class="glass-panel px-4 py-2 flex items-center gap-3 border-blue-500/40 pointer-events-auto">
-          <div class="w-9 h-9 rounded-lg bg-gradient-to-tr from-blue-900 via-cyan-600 to-cyan-400 flex items-center justify-center shadow-lg shadow-cyan-500/30 text-white font-black text-sm border border-cyan-400/50 cyber-logo-badge">
+          <div
+            class="w-9 h-9 rounded-lg bg-gradient-to-tr from-blue-900 via-cyan-600 to-cyan-400 flex items-center justify-center shadow-lg shadow-cyan-500/30 text-white font-black text-sm border border-cyan-400/50 cyber-logo-badge">
             <i class="fa-solid fa-crosshairs text-cyan-100 text-base cyber-crosshair-icon"></i>
           </div>
           <div>
@@ -85,28 +75,51 @@
         </div>
 
         <!-- Center Threat Status Badge -->
-        <div id="threat-container" class="glass-panel px-4 py-1.5 flex items-center gap-3 border-emerald-500/40 pointer-events-auto">
+        <div id="threat-container"
+          class="glass-panel px-4 py-1.5 flex items-center gap-3 border-emerald-500/40 pointer-events-auto">
           <span class="relative flex h-3 w-3">
-            <span id="threat-ping" class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+            <span id="threat-ping"
+              class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
             <span id="threat-dot" class="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
           </span>
           <div>
-            <div class="text-[9px] uppercase font-mono tracking-widest text-slate-400">DEFCON PROTOCOL</div>
-            <div id="threat-label" class="font-display text-xs font-black tracking-wider text-emerald-400 font-mono">DEFCON 4 // NOMINAL</div>
+            <div class="text-[9px] uppercase font-mono tracking-widest text-slate-400 flex items-center gap-1.5">
+              <span>DEFCON PROTOCOL</span>
+              <span class="text-slate-600">•</span>
+              <span>CVI: <span id="header-cvi-val" class="text-emerald-400 font-bold">14%</span></span>
+            </div>
+            <div id="threat-label" class="font-display text-xs font-black tracking-wider text-emerald-400 font-mono">
+              DEFCON 4 // NOMINAL</div>
           </div>
         </div>
 
         <!-- Quick View Action Controls -->
         <div class="glass-panel px-3 py-1.5 flex items-center gap-2 pointer-events-auto">
-          <button id="btn-focus-pune" class="text-xs px-2.5 py-1.5 rounded bg-slate-800 hover:bg-blue-900/60 hover:text-cyan-300 border border-slate-700 text-slate-200 font-medium transition flex items-center gap-1.5" title="Center camera on Pune Grid">
+          <button id="btn-zoom-in"
+            class="text-xs px-2.5 py-1.5 rounded bg-slate-800 hover:bg-blue-900/60 hover:text-cyan-300 border border-slate-700 text-slate-200 font-medium transition flex items-center gap-1"
+            title="Zoom in">
+            <i class="fa-solid fa-plus text-cyan-400"></i>
+          </button>
+          <button id="btn-zoom-out"
+            class="text-xs px-2.5 py-1.5 rounded bg-slate-800 hover:bg-blue-900/60 hover:text-cyan-300 border border-slate-700 text-slate-200 font-medium transition flex items-center gap-1"
+            title="Zoom out">
+            <i class="fa-solid fa-minus text-cyan-400"></i>
+          </button>
+          <button id="btn-focus-pune"
+            class="text-xs px-2.5 py-1.5 rounded bg-slate-800 hover:bg-blue-900/60 hover:text-cyan-300 border border-slate-700 text-slate-200 font-medium transition flex items-center gap-1.5"
+            title="Center camera on Pune Grid">
             <i class="fa-solid fa-crosshairs text-cyan-400"></i>
             <span>Reset Camera</span>
           </button>
-          <button id="btn-toggle-orbit" class="text-xs px-2.5 py-1.5 rounded bg-blue-900/60 hover:bg-blue-900/80 text-cyan-300 border border-cyan-500/50 font-medium transition flex items-center gap-1.5" title="Toggle Auto-Orbit Rotation">
+          <button id="btn-toggle-orbit"
+            class="text-xs px-2.5 py-1.5 rounded bg-blue-900/60 hover:bg-blue-900/80 text-cyan-300 border border-cyan-500/50 font-medium transition flex items-center gap-1.5"
+            title="Toggle Auto-Orbit Rotation">
             <i id="orbit-icon" class="fa-solid fa-pause text-cyan-400"></i>
             <span id="orbit-text">Pause Rotation</span>
           </button>
-          <button id="btn-reset-all" class="text-xs px-2.5 py-1.5 rounded bg-slate-800 hover:bg-rose-900/60 hover:text-rose-300 border border-slate-700 text-slate-200 font-medium transition flex items-center gap-1.5" title="Reset all sliders">
+          <button id="btn-reset-all"
+            class="text-xs px-2.5 py-1.5 rounded bg-slate-800 hover:bg-rose-900/60 hover:text-rose-300 border border-slate-700 text-slate-200 font-medium transition flex items-center gap-1.5"
+            title="Reset all sliders">
             <i class="fa-solid fa-rotate-right text-rose-400"></i>
             <span>Reset</span>
           </button>
@@ -122,19 +135,21 @@
         <div class="flex items-center justify-between border-b border-slate-700/60 pb-2 mb-3">
           <h2 class="font-display text-xs font-bold uppercase tracking-wider text-cyan-400 flex items-center gap-2">
             <i class="fa-solid fa-sliders"></i>
-            <span>Climate Stress Matrix</span>
+            <span>Climate & Threat Stress Matrix</span>
           </h2>
-          <span class="text-[9px] font-mono text-cyan-300 px-1.5 py-0.5 rounded bg-blue-950 border border-blue-800">LIVE SYNC</span>
+          <span class="text-[9px] font-mono text-cyan-300 px-1.5 py-0.5 rounded bg-blue-950 border border-blue-800">LIVE
+            SYNC</span>
         </div>
 
         <!-- Ambient Temperature Slider -->
-        <div class="mb-4">
+        <div class="mb-3.5">
           <div class="flex items-center justify-between text-xs mb-1.5">
             <label for="slider-temp" class="text-slate-300 flex items-center gap-1.5 font-medium">
               <i class="fa-solid fa-temperature-high text-amber-400"></i>
               <span>Ambient Temperature</span>
             </label>
-            <span id="val-temp" class="font-mono font-bold text-amber-400 text-xs px-2 py-0.5 rounded bg-amber-950/80 border border-amber-800">32°C</span>
+            <span id="val-temp"
+              class="font-mono font-bold text-amber-400 text-xs px-2 py-0.5 rounded bg-amber-950/80 border border-amber-800">32°C</span>
           </div>
           <input type="range" id="slider-temp" min="30" max="50" step="1" value="32" class="slider-temp">
           <div class="flex justify-between text-[10px] font-mono text-slate-500 mt-1">
@@ -145,13 +160,15 @@
         </div>
 
         <!-- Monsoon Rainfall Slider -->
-        <div class="mb-4">
+        <div class="mb-3.5">
           <div class="flex items-center justify-between text-xs mb-1.5">
             <label for="slider-rain" class="text-slate-300 flex items-center gap-1.5 font-medium">
               <i class="fa-solid fa-cloud-showers-heavy text-cyan-400"></i>
               <span>Monsoon Rainfall</span>
             </label>
-            <span id="val-rain" class="font-mono font-bold text-cyan-400 text-xs px-2 py-0.5 rounded bg-cyan-950/80 border border-cyan-800">25 mm/hr</span>
+            <span id="val-rain"
+              class="font-mono font-bold text-cyan-400 text-xs px-2 py-0.5 rounded bg-cyan-950/80 border border-cyan-800">25
+              mm/hr</span>
           </div>
           <input type="range" id="slider-rain" min="0" max="150" step="5" value="25" class="slider-rain">
           <div class="flex justify-between text-[10px] font-mono text-slate-500 mt-1">
@@ -162,19 +179,75 @@
         </div>
 
         <!-- Power Grid Load Slider -->
-        <div class="mb-4">
+        <div class="mb-3.5">
           <div class="flex items-center justify-between text-xs mb-1.5">
             <label for="slider-load" class="text-slate-300 flex items-center gap-1.5 font-medium">
               <i class="fa-solid fa-bolt text-yellow-400"></i>
               <span>Power Grid Load</span>
             </label>
-            <span id="val-load" class="font-mono font-bold text-yellow-400 text-xs px-2 py-0.5 rounded bg-yellow-950/80 border border-yellow-800">70%</span>
+            <span id="val-load"
+              class="font-mono font-bold text-yellow-400 text-xs px-2 py-0.5 rounded bg-yellow-950/80 border border-yellow-800">70%</span>
           </div>
           <input type="range" id="slider-load" min="50" max="100" step="5" value="70" class="slider-load">
           <div class="flex justify-between text-[10px] font-mono text-slate-500 mt-1">
             <span>50%</span>
             <span class="text-yellow-400">>85% Overload</span>
             <span>100%</span>
+          </div>
+        </div>
+
+        <!-- SCADA Cyber-Attack Index Slider -->
+        <div class="mb-3.5">
+          <div class="flex items-center justify-between text-xs mb-1.5">
+            <label for="slider-cyber" class="text-slate-300 flex items-center gap-1.5 font-medium">
+              <i class="fa-solid fa-shield-virus text-fuchsia-400"></i>
+              <span>SCADA Cyber Attack</span>
+            </label>
+            <span id="val-cyber"
+              class="font-mono font-bold text-slate-300 text-xs px-2 py-0.5 rounded bg-slate-900 border border-slate-700">0%</span>
+          </div>
+          <input type="range" id="slider-cyber" min="0" max="100" step="5" value="0" class="slider-cyber">
+          <div class="flex justify-between text-[10px] font-mono text-slate-500 mt-1">
+            <span>0% Passive</span>
+            <span class="text-purple-400">>40% Infiltration</span>
+            <span class="text-fuchsia-400">100% Breached</span>
+          </div>
+        </div>
+
+        <!-- Cyclonic Wind Speed Slider -->
+        <div class="mb-3.5">
+          <div class="flex items-center justify-between text-xs mb-1.5">
+            <label for="slider-wind" class="text-slate-300 flex items-center gap-1.5 font-medium">
+              <i class="fa-solid fa-wind text-teal-300"></i>
+              <span>Cyclonic Wind Speed</span>
+            </label>
+            <span id="val-wind"
+              class="font-mono font-bold text-slate-300 text-xs px-2 py-0.5 rounded bg-slate-900 border border-slate-700">15
+              km/h</span>
+          </div>
+          <input type="range" id="slider-wind" min="0" max="120" step="5" value="15" class="slider-wind">
+          <div class="flex justify-between text-[10px] font-mono text-slate-500 mt-1">
+            <span>0 km/h</span>
+            <span class="text-teal-400">>70 km/h Gale Trip</span>
+            <span class="text-rose-400">120 km/h</span>
+          </div>
+        </div>
+
+        <!-- Soil Saturation & Liquefaction Slider -->
+        <div class="mb-3.5">
+          <div class="flex items-center justify-between text-xs mb-1.5">
+            <label for="slider-soil" class="text-slate-300 flex items-center gap-1.5 font-medium">
+              <i class="fa-solid fa-mountain text-amber-500"></i>
+              <span>Soil Saturation / Liquefaction</span>
+            </label>
+            <span id="val-soil"
+              class="font-mono font-bold text-slate-300 text-xs px-2 py-0.5 rounded bg-slate-900 border border-slate-700">20%</span>
+          </div>
+          <input type="range" id="slider-soil" min="0" max="100" step="5" value="20" class="slider-soil">
+          <div class="flex justify-between text-[10px] font-mono text-slate-500 mt-1">
+            <span>0% Dry</span>
+            <span class="text-amber-400">>65% Subsidence</span>
+            <span class="text-rose-400">100% Liquefied</span>
           </div>
         </div>
 
@@ -187,19 +260,19 @@
           <div class="grid grid-cols-2 gap-2">
             <button id="preset-nominal" class="btn-preset active text-[11px] p-2 rounded text-left">
               <div class="font-bold text-slate-200">1. Baseline</div>
-              <div class="text-[9px] text-slate-400 font-mono">32°C | 25mm | 70%</div>
+              <div class="text-[9px] text-slate-400 font-mono">32°C | 25mm | 0% Cyb</div>
             </button>
             <button id="preset-heatwave" class="btn-preset text-[11px] p-2 rounded text-left">
               <div class="font-bold text-amber-300">2. Heatwave</div>
-              <div class="text-[9px] text-slate-400 font-mono">44°C | 0mm | 90%</div>
+              <div class="text-[9px] text-slate-400 font-mono">44°C | 90% Grid Load</div>
             </button>
             <button id="preset-cloudburst" class="btn-preset text-[11px] p-2 rounded text-left">
               <div class="font-bold text-cyan-300">3. Cloudburst</div>
-              <div class="text-[9px] text-slate-400 font-mono">28°C | 110mm | 65%</div>
+              <div class="text-[9px] text-slate-400 font-mono">110mm | 85km/h Gale</div>
             </button>
             <button id="preset-compound" class="btn-preset text-[11px] p-2 rounded text-left">
               <div class="font-bold text-rose-400">4. Compound</div>
-              <div class="text-[9px] text-slate-400 font-mono">43°C | 95mm | 90%</div>
+              <div class="text-[9px] text-slate-400 font-mono">85% Cyber | 80% Soil</div>
             </button>
           </div>
         </div>
@@ -228,7 +301,9 @@
             <i class="fa-solid fa-chart-pie"></i>
             <span>System Telemetry</span>
           </h2>
-          <span id="nodes-count-badge" class="text-[9px] font-mono text-emerald-400 px-1.5 py-0.5 rounded bg-emerald-950 border border-emerald-800">13 NODES ONLINE</span>
+          <span id="nodes-count-badge"
+            class="text-[9px] font-mono text-emerald-400 px-1.5 py-0.5 rounded bg-emerald-950 border border-emerald-800">13
+            NODES ONLINE</span>
         </div>
 
         <!-- Radial Health Gauge -->
@@ -236,11 +311,13 @@
           <div class="relative w-28 h-28 flex items-center justify-center">
             <svg class="w-full h-full" viewBox="0 0 100 100">
               <circle cx="50" cy="50" r="42" stroke="rgba(51, 65, 85, 0.4)" stroke-width="8" fill="none" />
-              <circle id="gauge-circle" class="gauge-circle" cx="50" cy="50" r="42" stroke="#10B981" stroke-width="8" stroke-dasharray="264" stroke-dashoffset="0" stroke-linecap="round" fill="none" />
+              <circle id="gauge-circle" class="gauge-circle" cx="50" cy="50" r="42" stroke="#10B981" stroke-width="8"
+                stroke-dasharray="264" stroke-dashoffset="0" stroke-linecap="round" fill="none" />
             </svg>
             <div class="absolute flex flex-col items-center justify-center text-center">
               <span id="health-value" class="font-display text-2xl font-black text-emerald-400 leading-none">100%</span>
-              <span id="health-label" class="font-mono text-[9px] uppercase font-bold text-slate-400 mt-1 tracking-wider">RESILIENT</span>
+              <span id="health-label"
+                class="font-mono text-[9px] uppercase font-bold text-slate-400 mt-1 tracking-wider">RESILIENT</span>
             </div>
           </div>
         </div>
@@ -257,7 +334,8 @@
               <span id="sec-power-val" class="font-mono font-bold text-emerald-400">100% (4/4)</span>
             </div>
             <div class="w-full bg-slate-800 rounded-full h-2 overflow-hidden">
-              <div id="sec-power-bar" class="h-full bg-emerald-500 rounded-full transition-all duration-300" style="width: 100%"></div>
+              <div id="sec-power-bar" class="h-full bg-emerald-500 rounded-full transition-all duration-300"
+                style="width: 100%"></div>
             </div>
           </div>
 
@@ -271,7 +349,8 @@
               <span id="sec-transit-val" class="font-mono font-bold text-emerald-400">100% (4/4)</span>
             </div>
             <div class="w-full bg-slate-800 rounded-full h-2 overflow-hidden">
-              <div id="sec-transit-bar" class="h-full bg-emerald-500 rounded-full transition-all duration-300" style="width: 100%"></div>
+              <div id="sec-transit-bar" class="h-full bg-emerald-500 rounded-full transition-all duration-300"
+                style="width: 100%"></div>
             </div>
           </div>
 
@@ -285,7 +364,8 @@
               <span id="sec-water-val" class="font-mono font-bold text-emerald-400">100% (2/2)</span>
             </div>
             <div class="w-full bg-slate-800 rounded-full h-2 overflow-hidden">
-              <div id="sec-water-bar" class="h-full bg-emerald-500 rounded-full transition-all duration-300" style="width: 100%"></div>
+              <div id="sec-water-bar" class="h-full bg-emerald-500 rounded-full transition-all duration-300"
+                style="width: 100%"></div>
             </div>
           </div>
 
@@ -299,14 +379,16 @@
               <span id="sec-hospital-val" class="font-mono font-bold text-emerald-400">100% (3/3)</span>
             </div>
             <div class="w-full bg-slate-800 rounded-full h-2 overflow-hidden">
-              <div id="sec-hospital-bar" class="h-full bg-emerald-500 rounded-full transition-all duration-300" style="width: 100%"></div>
+              <div id="sec-hospital-bar" class="h-full bg-emerald-500 rounded-full transition-all duration-300"
+                style="width: 100%"></div>
             </div>
           </div>
         </div>
 
         <!-- Node Operational Matrix -->
         <div class="pt-2 border-t border-slate-700/60">
-          <div class="flex items-center justify-between text-[10px] font-mono text-slate-400 uppercase tracking-wider mb-2">
+          <div
+            class="flex items-center justify-between text-[10px] font-mono text-slate-400 uppercase tracking-wider mb-2">
             <span>3D Facility Matrix</span>
             <span class="text-slate-500 text-[9px]">CLICK TO INSPECT</span>
           </div>
@@ -324,36 +406,45 @@
         <div class="flex items-center justify-between pb-1 mb-1 border-b border-slate-700/60">
           <div class="flex items-center gap-2">
             <i class="fa-solid fa-terminal text-cyan-400 text-xs"></i>
-            <span class="font-display text-xs font-bold uppercase tracking-wider text-slate-200">Failure Cascade Log Stream</span>
+            <span class="font-display text-xs font-bold uppercase tracking-wider text-slate-200">Failure Cascade Log
+              Stream</span>
           </div>
           <div class="flex items-center gap-2">
-            <span id="failed-counter" class="text-[9px] font-mono px-2 py-0.5 rounded bg-slate-800 text-slate-300 font-bold">0 FAULTS</span>
-            <button id="btn-clear-terminal" class="text-[9px] px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-slate-200 transition">
+            <span id="failed-counter"
+              class="text-[9px] font-mono px-2 py-0.5 rounded bg-slate-800 text-slate-300 font-bold">0 FAULTS</span>
+            <button id="btn-clear-terminal"
+              class="text-[9px] px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-slate-200 transition">
               Clear
             </button>
           </div>
         </div>
-        <div id="terminal-stream" class="terminal-stream flex-1 rounded p-2 text-[11px] font-mono space-y-1 overflow-y-auto select-text">
-          <div class="text-emerald-400">[SYSTEM INIT] RE-DEFEND AI 3D Engine online. Pune infrastructure nodes nominal.</div>
+        <div id="terminal-stream"
+          class="terminal-stream flex-1 rounded p-2 text-[11px] font-mono space-y-1 overflow-y-auto select-text">
+          <div class="text-emerald-400">[SYSTEM INIT] RE-DEFEND AI 3D Engine online. Pune infrastructure nodes nominal.
+          </div>
           <div class="text-slate-400">[MONITOR] Live sensor input active: Temp, Rainfall rate, Grid power load.</div>
         </div>
       </div>
 
       <!-- Prescriptive AI Advice -->
-      <div class="w-full md:w-96 flex flex-col h-full bg-slate-900/80 rounded-lg p-2.5 border border-blue-500/20 overflow-hidden">
+      <div
+        class="w-full md:w-96 flex flex-col h-full bg-slate-900/80 rounded-lg p-2.5 border border-blue-500/20 overflow-hidden">
         <div class="flex items-center justify-between pb-1.5 mb-1.5 border-b border-blue-900/50">
           <div class="flex items-center gap-2">
             <i class="fa-solid fa-microchip text-emerald-400 text-xs"></i>
-            <span class="font-display text-xs font-bold uppercase tracking-wider text-slate-200">Prescriptive AI Fortification</span>
+            <span class="font-display text-xs font-bold uppercase tracking-wider text-slate-200">Prescriptive AI
+              Fortification</span>
           </div>
-          <span class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-800">AUTOMATED</span>
+          <span
+            class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-800">AUTOMATED</span>
         </div>
         <div id="ai-advice-content" class="flex-1 overflow-y-auto space-y-2 pr-1 text-xs">
           <!-- Populated via JavaScript -->
         </div>
         <div class="pt-2 border-t border-slate-800 flex items-center justify-between">
           <span class="text-[9px] text-slate-400 font-mono">Response Plan: Synchronized</span>
-          <button id="btn-apply-mitigation" class="text-xs px-2.5 py-1 rounded bg-blue-600 hover:bg-blue-500 text-white font-semibold transition shadow-md shadow-blue-600/30 flex items-center gap-1.5">
+          <button id="btn-apply-mitigation"
+            class="text-xs px-2.5 py-1 rounded bg-blue-600 hover:bg-blue-500 text-white font-semibold transition shadow-md shadow-blue-600/30 flex items-center gap-1.5">
             <i class="fa-solid fa-shield-virus"></i>
             <span>Deploy Countermeasures</span>
           </button>
@@ -363,7 +454,119 @@
 
   </div>
 
+  <!-- TACTICAL POPUP MODAL: PRESCRIPTIVE FORTIFICATION ENGAGED -->
+  <div id="tactical-modal"
+    class="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none opacity-0 transition-all duration-300">
+    <div class="absolute inset-0 bg-slate-950/80 backdrop-blur-md transition-opacity"></div>
+    <div
+      class="tactical-modal-box glass-panel border-2 border-cyan-400/70 p-5 md:p-6 rounded-2xl max-w-xl w-full shadow-[0_0_60px_rgba(6,182,212,0.45)] relative pointer-events-auto transform scale-95 transition-all duration-300 z-10 overflow-hidden">
+      <!-- Cyber Corner Accent Marks -->
+      <div class="absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2 border-cyan-400"></div>
+      <div class="absolute top-0 right-0 w-4 h-4 border-t-2 border-r-2 border-cyan-400"></div>
+      <div class="absolute bottom-0 left-0 w-4 h-4 border-b-2 border-l-2 border-cyan-400"></div>
+      <div class="absolute bottom-0 right-0 w-4 h-4 border-b-2 border-r-2 border-cyan-400"></div>
+
+      <!-- Top Header Badge & Close Button -->
+      <div class="flex items-center justify-between border-b border-cyan-500/30 pb-3 mb-4">
+        <div class="flex items-center gap-3">
+          <div
+            class="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-600 to-emerald-400 flex items-center justify-center shadow-lg shadow-cyan-500/50 text-slate-950 text-lg font-black">
+            <i class="fa-solid fa-bolt-lightning text-slate-950"></i>
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="font-display text-sm md:text-base font-black tracking-wider text-cyan-300 uppercase">
+                ⚡ PRESCRIPTIVE FORTIFICATION ENGAGED
+              </span>
+              <span
+                class="px-2 py-0.5 text-[9px] font-mono font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-400/50 rounded-full animate-pulse">
+                ACTIVE
+              </span>
+            </div>
+            <p class="text-[11px] font-mono text-slate-400">AUTONOMOUS MULTI-SECTOR RESILIENCE PROTOCOL // PUNE URBAN
+              METRO</p>
+          </div>
+        </div>
+        <button id="btn-close-modal"
+          class="text-slate-400 hover:text-cyan-300 w-8 h-8 rounded-lg bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700 flex items-center justify-center transition"
+          title="Dismiss Modal">
+          <i class="fa-solid fa-xmark text-sm"></i>
+        </button>
+      </div>
+
+      <!-- Tactical Cards Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4 text-xs">
+        <!-- 1. Microgrid Islanding -->
+        <div class="p-3 rounded-xl bg-slate-900/90 border border-cyan-500/40 relative overflow-hidden group">
+          <div class="flex items-center gap-2 text-cyan-400 font-bold mb-1 font-display">
+            <i class="fa-solid fa-network-wired text-xs"></i>
+            <span>MICROGRID ISLANDING</span>
+          </div>
+          <p class="text-[11px] text-slate-300 leading-relaxed font-mono">
+            MSEDCL 220kV Parvati & Kothrud decoupled into self-healing autonomous microgrid cells. Feeder isolation
+            confirmed.
+          </p>
+        </div>
+
+        <!-- 2. Dynamic Load Shedding & Aux Power -->
+        <div class="p-3 rounded-xl bg-slate-900/90 border border-emerald-500/40 relative overflow-hidden group">
+          <div class="flex items-center gap-2 text-emerald-400 font-bold mb-1 font-display">
+            <i class="fa-solid fa-charging-station text-xs"></i>
+            <span>LOAD SHED & AUX POWER</span>
+          </div>
+          <p class="text-[11px] text-slate-300 leading-relaxed font-mono">
+            18.4 MW non-essential commercial load shed. Sassoon & Deenanath hospitals switched to Tier-4 mobile
+            gen-sets.
+          </p>
+        </div>
+
+        <!-- 3. Emergency Ambulance Rerouting -->
+        <div class="p-3 rounded-xl bg-slate-900/90 border border-blue-500/40 relative overflow-hidden group">
+          <div class="flex items-center gap-2 text-blue-400 font-bold mb-1 font-display">
+            <i class="fa-solid fa-truck-medical text-xs"></i>
+            <span>EMERGENCY REROUTING</span>
+          </div>
+          <p class="text-[11px] text-slate-300 leading-relaxed font-mono">
+            Ambulance corridors dynamically routed via elevated bypass corridor (Avoiding flooded Pune Station
+            underpass).
+          </p>
+        </div>
+
+        <!-- 4. CVI Normalization -->
+        <div class="p-3 rounded-xl bg-slate-900/90 border border-amber-500/40 relative overflow-hidden group">
+          <div class="flex items-center gap-2 text-amber-400 font-bold mb-1 font-display">
+            <i class="fa-solid fa-shield-halved text-xs"></i>
+            <span>CVI NORMALIZATION</span>
+          </div>
+          <p class="text-[11px] text-slate-300 leading-relaxed font-mono">
+            Cascade Vulnerability Index normalized down to <span class="text-emerald-400 font-bold">22%</span> (Safe
+            Limit) // DEFCON 4 NOMINAL.
+          </p>
+        </div>
+      </div>
+
+      <!-- Action Footer with Manual Acknowledge -->
+      <div class="flex items-center justify-between pt-3 border-t border-slate-800">
+        <div class="flex items-center gap-2 text-[10px] font-mono text-slate-400">
+          <span class="relative flex h-2 w-2">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+            <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+          </span>
+          <span class="text-emerald-400 font-bold uppercase tracking-wider">DEFENSE PROTOCOL LOCKED</span>
+          <span class="text-slate-600">•</span>
+          <span>AWAITING OPERATOR ACKNOWLEDGEMENT</span>
+        </div>
+        <button id="btn-ack-mitigation"
+          class="text-xs px-4 py-1.5 rounded-lg bg-cyan-600 hover:bg-cyan-500 text-slate-950 font-bold transition flex items-center gap-1.5 shadow-md shadow-cyan-600/30">
+          <i class="fa-solid fa-check"></i>
+          <span>ACKNOWLEDGE</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- Application Logic -->
   <script src="app.js"></script>
 </body>
+
 </html>
